@@ -39,7 +39,7 @@
 | 1.5 | Core orchestrator | ✅ | `src/orchestrator.py` |
 | 1.6 | Workflow templates | ✅ | data/workflow-*.json |
 | 1.7 | Setup script | ✅ | `scripts/setup.sh` |
-| 1.8 | XActions login test | ⏳ | Need X credentials in .env |
+| 1.8 | XActions login test | ⏳ | Username: **@QuantumFomo** |
 | 1.9 | First auto-post | ⏳ | End-to-end: trending → post |
 
 ### 🟡 Phase 2 — Engagement (Target: Minggu 1-2)
