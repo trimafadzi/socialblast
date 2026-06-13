@@ -135,3 +135,4 @@ xurl whoami → real metrics (followers, likes)
 | 13 Jun 2026 | **🔥 Phase 2 scripts built — engagement, follow, reply helper (xurl edition)** |
 | 13 Jun 2026 | **⏰ 4 growth cron jobs deployed — engagement 2x, follow 1x, drafts 1x** |
 | 13 Jun 2026 | **🆓 OpenRouter free tier — Gemini Flash, $0 AI cost** |
+| 13 Jun 2026 | **🎲 Content jitter — random 0-30m window before auto-post** |

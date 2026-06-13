@@ -98,12 +98,12 @@
 ## ⏰ Cron Schedule
 
 ### Content (Phase 1)
-| Slot | WIB | Theme | Categories |
-|------|-----|-------|------------|
-| 🌅 Morning | 07:00 | Alpha | crypto update, AI tools, prediction, contrarian, on-chain |
-| ☀️ Midday | 12:00 | Fire | chart insight, dev hot take, underrated project, psychology, alpha |
-| 🌤 Afternoon | 16:00 | Insight | AI×crypto, lesson learned, 6-month predict, data, narrative |
-| 🌙 Evening | 21:00 | Thought | building in public, market recap, smart money, unpopular, AI future |
+| Slot | WIB | Window Actual | Theme |
+|------|-----|--------------|-------|
+| 🌅 Morning | 07:00 | 07:00-07:30 | Alpha |
+| ☀️ Midday | 12:00 | 12:00-12:30 | Fire |
+| 🌤 Afternoon | 16:00 | 16:00-16:30 | Insight |
+| 🌙 Evening | 21:00 | 21:00-21:30 | Thought |
 
 ### Growth (Phase 2)
 | WIB | UTC | Job | Script | Limit |
@@ -144,7 +144,7 @@
 | Principle | Rule |
 |-----------|------|
 | Warm-up | Akun baru: minggu 1 manual/organic, bot start minggu 2 |
-| Random delay | Semua aksi pakai random jitter 30-120 detik antar call |
+| Random delay | Semua aksi pakai random jitter antar call + startup jitter 0-30m |
 | Natural pattern | No burst at :00/:15/:30/:45 — human-like timing |
 | Rate cap | Follow ≤15/hari, like ≤50/hari, reply ≤5/hari ke akun besar |
 | Shadowban check | Tiap 2 hari: search `from:QuantumFomo` + cek via shadowban.io |
@@ -199,3 +199,4 @@ xurl search (trending) → AI draft → Bos review → xurl post
 | 13 Jun 2026 | **🔥 Phase 2 scripts built — engagement, follow, reply helper (xurl edition)** |
 | 13 Jun 2026 | **⏰ 4 growth cron jobs deployed — engagement 2x, follow 1x, drafts 1x** |
 | 13 Jun 2026 | **🆓 AI switched to OpenRouter free tier — Gemini 2.0 Flash, $0 cost** |
+| 13 Jun 2026 | **🎲 Content jitter — random 0-30 menit sebelum auto-post (anti-detection)** |
