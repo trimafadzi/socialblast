@@ -1,104 +1,104 @@
-"""AI Content Generator — OpenAI-powered tweet generation"""
+"""AI Content Generator — XActions built-in AI (no API key needed)"""
+import json
 import random
-from openai import OpenAI
+import subprocess
+from pathlib import Path
 from .core import settings, log
 
-# ─── Prompts ─────────────────────────────────────────────
-TWEET_PROMPTS = [
-    "Write a short, spicy hot take about {topic} in under 280 chars. Make it provocative but not offensive.",
-    "Share an interesting insight about {topic} that most people don't know. Max 280 chars.",
-    "Create an engaging question about {topic} to spark discussion. Max 280 chars.",
-    "Post a bold prediction about {topic} for the next 6 months. Max 280 chars.",
-    "Write a thread hook about {topic} (first tweet only). Attention-grabbing, max 280 chars.",
-    "Share a contrarian opinion about {topic} that will get replies. Max 280 chars.",
+ROOT = Path(__file__).parent.parent
+
+# ─── Prompt Templates ───────────────────────────────────
+TWEET_STYLES = [
+    "a spicy hot take about {topic} that will trigger people. Max 280 chars.",
+    "a bold prediction about {topic} for the next 6 months. Max 280 chars.",
+    "a contrarian opinion about {topic} that nobody talks about. Max 280 chars.",
+    "an alpha leak about {topic} disguised as a casual observation. Max 280 chars.",
+    "a fomo-inducing tweet about {topic}. Make it urgent. Max 280 chars.",
+    "a 'I told you so' tweet about {topic}. Smug but factual. Max 280 chars.",
 ]
 
-REPLY_PROMPT = """You're replying to this tweet:
-"{tweet}"
-
-Write a short, witty, and engaging reply (max 200 chars). 
-Be authentic — not like a bot. Add value, humor, or insight.
-Niche context: {niche}"""
-
-THREAD_PROMPT = """Create a {count}-tweet thread about {topic}.
-Each tweet must be under 280 chars.
-Make it educational + engaging.
-Return as JSON array: ["tweet1", "tweet2", ...]"""
+REPLY_STYLES = [
+    "a witty reply to someone who posted about {topic}. Add value, don't just agree. Max 200 chars.",
+    "a contrarian reply that challenges the OP's view on {topic}. Respectful but firm. Max 200 chars.",
+    "a 'here's what they're not telling you' reply about {topic}. Max 200 chars.",
+]
 
 
 class ContentGenerator:
-    """Generates AI-powered tweets and replies."""
+    """XActions AI-powered tweet generator — no API keys needed."""
 
     def __init__(self):
-        self.client = OpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
         self.niche = [n.strip() for n in settings.NICHE]
 
-    def _generate(self, prompt: str, max_tokens: int = 150) -> str:
-        """Call OpenAI API to generate text."""
-        if not self.client:
-            log.warning("No OpenAI API key — using placeholder content")
-            return self._placeholder()
+    def _xactions_ai(self, prompt: str) -> str:
+        """Call XActions AI to generate text."""
+        cmd = ["npx", "xactions", "ai", "generate", prompt]
+        log.debug(f"XActions AI: {prompt[:80]}...")
 
         try:
-            resp = self.client.chat.completions.create(
-                model=settings.OPENAI_MODEL,
-                messages=[
-                    {"role": "system", "content": "You are a witty social media expert. Keep responses short, authentic, and engaging. Never sound like a bot."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=max_tokens,
-                temperature=0.9,
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=str(ROOT),
             )
-            text = resp.choices[0].message.content.strip()
-            # Strip quotes if present
-            text = text.strip('"').strip("'")
-            # Truncate to 280 if needed
+            if result.returncode != 0:
+                log.warning(f"XActions AI error: {result.stderr[:100]}")
+                return self._fallback()
+
+            output = result.stdout.strip()
+            # Try to parse JSON (XActions sometimes wraps in JSON)
+            try:
+                data = json.loads(output)
+                if isinstance(data, dict):
+                    text = data.get("text") or data.get("tweet") or data.get("content", "")
+                elif isinstance(data, list) and data:
+                    text = data[0] if isinstance(data[0], str) else data[0].get("text", "")
+                else:
+                    text = output
+            except:
+                text = output
+
+            # Clean up
+            text = text.strip('"').strip("'").strip()
             if len(text) > 280:
                 text = text[:277] + "..."
-            return text
-        except Exception as e:
-            log.error(f"OpenAI API error: {e}")
-            return self._placeholder()
 
-    def _placeholder(self) -> str:
-        """Fallback content when API unavailable."""
+            return text if text else self._fallback()
+
+        except subprocess.TimeoutExpired:
+            log.warning("XActions AI timeout")
+            return self._fallback()
+        except Exception as e:
+            log.error(f"XActions AI failed: {e}")
+            return self._fallback()
+
+    def _fallback(self) -> str:
+        """Hardcoded fallback tweets (no AI, no API needed)."""
         topic = random.choice(self.niche)
         templates = [
-            f"Just another day in {topic}... the innovation never stops 🚀",
-            f"Hot take: {topic} will surprise everyone this quarter 👀",
-            f"Unpopular opinion about {topic}: most people are looking at the wrong metrics 📊",
-            f"Been deep in {topic} research today. Some fascinating patterns emerging...",
+            f"Unpopular opinion: {topic} is still in chapter 1. The real story hasn't started yet 👀",
+            f"Everyone's sleeping on {topic}. Meanwhile the smart money is accumulating silently 🧠",
+            f"{topic} in 6 months will look nothing like today. Here's why nobody's ready...",
+            f"Most people overcomplicate {topic}. Here's the one metric that actually matters 📊",
+            f"Been tracking {topic} data for months. The pattern is too obvious to ignore at this point",
+            f"Hot take: the biggest {topic} winners won't be who you think. Watch the builders, not the talkers",
         ]
         return random.choice(templates)
 
     def generate_tweet(self) -> str:
         """Generate a single tweet."""
         topic = random.choice(self.niche)
-        prompt_template = random.choice(TWEET_PROMPTS)
-        prompt = prompt_template.format(topic=topic)
-        return self._generate(prompt, max_tokens=120)
+        style = random.choice(TWEET_STYLES).format(topic=topic)
+        return self._xactions_ai(style)
 
     def generate_reply(self, tweet_text: str) -> str:
         """Generate a reply to a given tweet."""
-        prompt = REPLY_PROMPT.format(
-            tweet=tweet_text[:200],
-            niche=", ".join(self.niche),
-        )
-        return self._generate(prompt, max_tokens=100)
-
-    def generate_thread(self, topic: str = None, count: int = 5) -> list[str]:
-        """Generate a tweet thread."""
-        topic = topic or random.choice(self.niche)
-        prompt = THREAD_PROMPT.format(topic=topic, count=count)
-        text = self._generate(prompt, max_tokens=500)
-
-        try:
-            import json
-            tweets = json.loads(text)
-            return [t[:280] for t in tweets[:count]]
-        except:
-            # Fallback: split into sentences
-            return [s.strip()[:280] for s in text.split(".") if s.strip()][:count]
+        topic = self.niche[0]
+        style = random.choice(REPLY_STYLES).format(topic=topic)
+        prompt = f"{style}\n\nOriginal tweet: \"{tweet_text[:150]}\""
+        return self._xactions_ai(prompt)
 
 
 # Singleton

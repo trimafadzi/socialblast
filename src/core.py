@@ -37,8 +37,6 @@ class Settings:
     X_PASSWORD = os.getenv("X_PASSWORD", "")
 
     # Content
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-    OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
     NICHE = os.getenv("NICHE", "crypto,tech,AI").split(",")
     POST_INTERVAL_MINUTES = int(os.getenv("POST_INTERVAL_MINUTES", "120"))
     MAX_DAILY_POSTS = int(os.getenv("MAX_DAILY_POSTS", "12"))

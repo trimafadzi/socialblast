@@ -1,7 +1,7 @@
 # SocialBlast — PRD (XActions + Agent-Reach)
 
 ## 🎯 Visi
-Bot X/Twitter automation pake **XActions** (post, reply, engagement) + **Agent-Reach** (social listening) + **Python orchestrator**. Simpel, cepet, tanpa ribet bikin browser automation sendiri.
+Bot X/Twitter automation pake **XActions** (post, reply, engagement + **built-in AI**) + **Agent-Reach** (social listening) + **Python orchestrator**. Zero external API key — semua AI pake XActions internal.
 
 ## 🏗️ Arsitektur
 
@@ -9,7 +9,7 @@ Bot X/Twitter automation pake **XActions** (post, reply, engagement) + **Agent-R
 socialblast/
 ├── src/
 │   ├── orchestrator.py     # Main loop: schedule → listen → generate → post
-│   ├── generator.py        # OpenAI content generation
+│   ├── generator.py        # XActions AI content generation (no API key)
 │   └── core.py             # Config, state, logging
 ├── config/
 │   └── accounts.json       # X credentials per account
@@ -27,32 +27,32 @@ socialblast/
 ```
 Agent-Reach: trending search
        ↓
-Python: generate content (OpenAI)
+XActions AI: generate tweet (built-in)
        ↓
 XActions CLI: post tweet
        ↓
 Agent-Reach: find viral replies
        ↓
-XActions CLI: auto-reply
+XActions CLI: auto-reply + engage
 ```
 
 ## 🛠️ Tools
 
 | Tool | Install | Fungsi |
 |------|---------|--------|
-| XActions | `npm i -g xactions` | Post, reply, like, follow, scrape |
-| Agent-Reach | `npm i -g agent-reach` | Social listening, trending |
-| Python | system | Orchestrator + OpenAI content |
+| XActions | `npm i xactions` | Post, reply, like, follow, scrape + AI generation |
+| Agent-Reach | `pip install agent-reach` | Social listening, trending |
+| Python | system | Orchestrator |
 | PM2 | system | Process manager |
 
 ## ✅ Fitur
 
 ### Phase 1 — MVP
 - [x] Project skeleton & docs
-- [ ] XActions login & post test
-- [ ] Agent-Reach trending search
-- [ ] Python orchestrator
-- [ ] Auto-post via Hermes cron
+- [x] XActions AI generator (no API key)
+- [x] Python orchestrator CLI
+- [ ] XActions login (session cookie)
+- [ ] First auto-post (trending → AI generate → post)
 
 ### Phase 2 — Engagement
 - [ ] Auto-reply trending tweets
@@ -77,6 +77,15 @@ XActions CLI: auto-reply
 | Followers | 0 | 500 | 2K+ |
 | Impressions | 0 | 500K | 5M+ |
 
+## 💰 Cost
+
+| Item | Monthly |
+|------|---------|
+| VPS (existing) | $0 |
+| X Premium | $8 |
+| AI (XActions built-in) | **$0** |
+| **Total** | **$8** |
+
 ## 💰 Monetization
 1. **X Ads Revenue Sharing** — 5M impressions/3mo + 500 followers + Premium
 2. **Affiliate links** — sisipin di reply
@@ -85,4 +94,4 @@ XActions CLI: auto-reply
 ## ⚠️ Risiko
 - Shadowban / account ban
 - X API changes
-- XActions/Agent-Reach upstream break
+- XActions upstream break

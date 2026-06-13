@@ -77,7 +77,7 @@
 | Automation | **XActions** (npm) | Post, like, reply, follow, scrape |
 | Listening | **Agent-Reach** (npm) | Trending topics, viral tweets |
 | Orchestrator | **Python 3.11** | Schedule, coordinate, generate |
-| AI Content | **OpenAI GPT-4o-mini** | Tweet generation |
+| AI Content | **XActions built-in** | Tweet generation (no API key) |
 | Scheduler | **Hermes cron** | Auto-run tiap interval |
 | State | **JSON files** | Track posts & stats |
 
@@ -89,8 +89,8 @@
 |------|---------|
 | VPS (existing) | $0 |
 | X Premium | $8 |
-| OpenAI API | $2-5 |
-| **Total** | **$10-13** |
+| AI (XActions built-in) | **$0** |
+| **Total** | **$8** |
 
 ---
 
