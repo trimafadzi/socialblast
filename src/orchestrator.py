@@ -65,7 +65,7 @@ def login():
 def search_tweets(query: str, limit: int = 10) -> list[dict]:
     """Search tweets by keyword."""
     log.info(f"Searching: {query}")
-    result = xactions("search", query, "--limit", str(limit), "--json")
+    result = xactions("search", query, "--limit", str(limit))
     if result:
         tweets = result if isinstance(result, list) else result.get("tweets", [])
         log.info(f"Found {len(tweets)} tweets")
@@ -76,7 +76,7 @@ def search_tweets(query: str, limit: int = 10) -> list[dict]:
 def trending() -> list[str]:
     """Get trending topics."""
     log.info("Fetching trending...")
-    result = xactions("scrape", "trending", "--json")
+    result = xactions("scrape", "trending", "--limit", "10")
     if result:
         trends = result if isinstance(result, list) else result.get("trends", [])
         return [t.get("name") or t.get("topic") or str(t) for t in trends[:10]]

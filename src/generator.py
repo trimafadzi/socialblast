@@ -3,7 +3,11 @@ import json
 import random
 import subprocess
 from pathlib import Path
-from .core import settings, log
+
+try:
+    from .core import settings, log
+except ImportError:
+    from core import settings, log
 
 ROOT = Path(__file__).parent.parent
 
