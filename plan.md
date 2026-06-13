@@ -1,7 +1,7 @@
 # SocialBlast — Implementation Plan
 
-> **Stack:** xurl (X API v2) + Python (orchestrator) + Hermes Cron (scheduler)
-> **Status:** ✅ Phase 1 Complete — 4x/day Auto-Poster LIVE via X API v2
+> **Stack:** xurl (X API v2) + Python (orchestrator) + OpenAI (AI drafts) + Hermes Cron (scheduler)
+> **Status:** ✅ Phase 1 Complete ✅ Phase 2 Growth Scripts Deployed
 > **Last Updated:** 13 Jun 2026
 
 ---
@@ -50,15 +50,17 @@
 | 1.9 | Cron auto-scheduler | ✅ | 07/12/16/21 WIB, silent (no_agent) |
 | 1.10 | First auto-post | ✅ | Cycle tested & working |
 
-### 🟡 Phase 2 — Engagement (Target: Minggu 1-2)
+### 🟡 Phase 2 — Growth ✅ SCRIPTS DEPLOYED
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 2.1 | XActions AI voice analysis | ⏳ | Need `ai analyze` token config |
-| 2.2 | Auto-reply trending | ⏳ | Reply to viral tweets in niche |
-| 2.3 | Like & follow target | ⏳ | Grow following organically |
-| 2.4 | Analytics tracking | ⏳ | Impressions, followers, engagement |
-| 2.5 | Rate limit guard | ⏳ | Anti-shadowban protection |
+| 2.1 | Engagement script | ✅ | `1_engagement_cron.py` — 8 likes/run, 2x/day, 8-20s delay |
+| 2.2 | Smart follow | ✅ | `2_smart_follow.py` — 15/day, seed followers, 30-90s delay |
+| 2.3 | Reply helper (draft) | ✅ | `3_reply_helper.py --draft` — OpenAI → pending_replies.json |
+| 2.4 | Reply helper (review) | ✅ | `3_reply_helper.py --review` — human approve/edit/skip |
+| 2.5 | Cron deployment | ✅ | 4 growth cron jobs (08:00/10:00/11:00/19:00 WIB) |
+| 2.6 | Shadowban monitoring | ⏳ | Next: cron tiap 2 hari cek search visibility |
+| 2.7 | Rate limit tuning | ⏳ | Monitor after 1 week, adjust if needed |
 
 ### 🟢 Phase 3 — Scale (Target: Minggu 3-4)
 
@@ -94,12 +96,21 @@
 
 ## ⏰ Cron Schedule
 
+### Content (Phase 1)
 | Slot | WIB | Theme | Categories |
 |------|-----|-------|------------|
 | 🌅 Morning | 07:00 | Alpha | crypto update, AI tools, prediction, contrarian, on-chain |
 | ☀️ Midday | 12:00 | Fire | chart insight, dev hot take, underrated project, psychology, alpha |
 | 🌤 Afternoon | 16:00 | Insight | AI×crypto, lesson learned, 6-month predict, data, narrative |
 | 🌙 Evening | 21:00 | Thought | building in public, market recap, smart money, unpopular, AI future |
+
+### Growth (Phase 2)
+| WIB | UTC | Job | Script | Limit |
+|-----|-----|-----|--------|-------|
+| 08:00 | 01:00 | Reply Drafts | `3_reply_helper.py --draft` | 5 drafts |
+| 10:00 | 03:00 | Smart Follow | `2_smart_follow.py` | 5 follows |
+| 11:00 | 04:00 | Engagement | `1_engagement_cron.py` | 8 likes |
+| 19:00 | 12:00 | Engagement | `1_engagement_cron.py` | 8 likes |
 
 ---
 
@@ -137,12 +148,12 @@
 | Rate cap | Follow ≤15/hari, like ≤50/hari, reply ≤5/hari ke akun besar |
 | Shadowban check | Tiap 2 hari: search `from:QuantumFomo` + cek via shadowban.io |
 
-### Build Order (Low Risk → High Risk)
+### Build Order (Low Risk → High Risk) ✅ ALL DEPLOYED
 | # | Script | Risk | Timeline |
 |---|--------|------|----------|
-| 1 | `engagement.py` — search trending → like → log | 🟢 Low | Sekarang |
-| 2 | `smart_follow.py` — follow 10-15/hari, crypto niche, random delay | 🟡 Medium | Minggu 1 |
-| 3 | `reply_assistant.py` — cari momen → draft reply → **human review → post** | 🔴 High | Minggu 2 |
+| 1 | `1_engagement_cron.py` — search trending → like → log | 🟢 Low | ✅ Deployed |
+| 2 | `2_smart_follow.py` — follow 5/run, 15/hari, crypto niche | 🟡 Medium | ✅ Deployed |
+| 3 | `3_reply_helper.py` — OpenAI draft → **human review → post** | 🔴 High | ✅ Deployed |
 
 ### Realistic Growth Targets (Revised)
 | Metric | Now | Month 1 | Month 3 |
@@ -184,3 +195,5 @@ xurl search (trending) → AI draft → Bos review → xurl post
 | 13 Jun 2026 | Full cycle tested: topic → generate → post → log ✅ |
 | 13 Jun 2026 | **⚡ xurl migration — X API v2, 1 detik per post, real metrics & trending** |
 | 13 Jun 2026 | **📋 Conservative growth strategy — anti-detection, warm-up, human-in-the-loop** |
+| 13 Jun 2026 | **🔥 Phase 2 scripts built — engagement, follow, reply helper (xurl edition)** |
+| 13 Jun 2026 | **⏰ 4 growth cron jobs deployed — engagement 2x, follow 1x, drafts 1x** |

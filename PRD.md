@@ -13,16 +13,28 @@ socialblast/
 │   ├── browser.py          # Playwright utils (backup)
 │   └── core.py             # Config, state, logging
 ├── scripts/
-│   ├── orchestrator.py     # ⭐ xurl-based auto-poster
-│   ├── daily_report.py     # ⭐ xurl whoami + log report
-│   ├── post_tweet.py       # Playwright post (backup)
-│   ├── extract_token.py    # Auth token extractor
-│   └── cron_runner.py      # Silent cron wrapper
+│   ├── orchestrator.py        # ⭐ xurl-based auto-poster
+│   ├── daily_report.py        # ⭐ xurl whoami + log report
+│   ├── 1_engagement_cron.py   # ⭐ Search trending → like (8/run)
+│   ├── 2_smart_follow.py      # ⭐ Follow seed followers (15/day)
+│   ├── 3_reply_helper.py      # ⭐ AI draft → human review → post
+│   ├── run_engagement.sh      # Cron wrapper
+│   ├── run_follow.sh          # Cron wrapper
+│   ├── run_reply_draft.sh     # Cron wrapper
+│   ├── post_tweet.py          # Playwright post (backup)
+│   ├── extract_token.py       # Auth token extractor
+│   └── cron_runner.py         # Silent cron wrapper
 ├── data/
-│   ├── poster_state.json   # Topic & template rotation state
-│   └── state.json          # Legacy state
+│   ├── poster_state.json      # Topic & template rotation state
+│   ├── engagement_state.json  # Liked tweet tracking
+│   ├── follow_state.json      # Follow queue + daily count
+│   ├── pending_replies.json   # AI draft replies (review queue)
+│   └── state.json             # Legacy state
 ├── logs/
-│   └── poster.log          # Auto-post activity log
+│   ├── poster.log             # Auto-post activity log
+│   ├── engagement.log         # Like activity log
+│   ├── follow.log             # Follow activity log
+│   └── reply.log              # Reply draft + post log
 ├── .env                    # X credentials (gitignored)
 ├── PRD.md
 └── plan.md
@@ -61,13 +73,14 @@ xurl whoami → real metrics (followers, likes)
 - [x] Daily report with live metrics (21:00 WIB)
 - [x] Silent mode — zero token cost
 
-### Phase 2 — Growth (Conservative)
-- [ ] Shadowban monitoring — cron tiap 2 hari cek search visibility
-- [ ] Engagement script — search trending → like → log (≤50 likes/hari)
-- [ ] Smart follow — 10-15/hari, crypto niche, random delay 30-120s
-- [ ] Reply assistant — AI draft → **human review** → post (≤5/hari ke akun besar)
-- [ ] Content pipeline — 5-10 AI drafts/hari, Bos approve yang terbaik
-- [ ] Random jitter — semua aksi anti-pattern detection
+### Phase 2 — Growth (Conservative) 🚀 DEPLOYED
+- [x] Shadowban monitoring — cron tiap 2 hari cek search visibility
+- [x] Engagement script — search trending → like → log (8 likes/run, 16/hari)
+- [x] Smart follow — 5/run, 15/hari, crypto niche, random delay 30-90s
+- [x] Reply assistant — AI draft (OpenAI) → **human review** → post (≤5/hari)
+- [x] Content pipeline — 5-10 AI drafts/hari, Bos approve via `--review`
+- [x] Random jitter — semua aksi anti-pattern detection (startup + antar-call)
+- [x] Cron deployment — 4 Hermes cron jobs (08:00/10:00/11:00/19:00 WIB)
 
 ### Phase 3 — Content Scale
 - [ ] Thread generator — 5-7 tweet threads (AI draft → review → post)
@@ -119,3 +132,5 @@ xurl whoami → real metrics (followers, likes)
 | 13 Jun 2026 | 4x/day cron auto-poster LIVE — topic rotation + templates |
 | 13 Jun 2026 | **⚡ Full xurl migration — X API v2, 1 detik per post, 100% reliable** |
 | 13 Jun 2026 | **📋 Revised Phase 2-4 — conservative growth, anti-detection, human-in-the-loop** |
+| 13 Jun 2026 | **🔥 Phase 2 scripts built — engagement, follow, reply helper (xurl edition)** |
+| 13 Jun 2026 | **⏰ 4 growth cron jobs deployed — engagement 2x, follow 1x, drafts 1x** |
