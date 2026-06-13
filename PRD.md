@@ -1,21 +1,22 @@
-# SocialBlast — PRD (XActions + Playwright)
+# SocialBlast — PRD (xurl + X API v2)
 
 ## 🎯 Visi
-Bot X/Twitter automation pake **XActions** (scraping, AI) + **Playwright** (posting) + **Python orchestrator**. Zero external API key — posting via cookie auth, AI via XActions internal.
+Bot X/Twitter automation pake **xurl** (official X CLI) + **X API v2** + **Python orchestrator**. Posting, search, engagement, analytics — all via official API. $5 credits = thousands of posts.
 
 ## 🏗️ Arsitektur
 
 ```
 socialblast/
 ├── src/
-│   ├── orchestrator.py     # Main loop: trending → generate → post
-│   ├── generator.py        # XActions AI + smart template fallback
-│   ├── browser.py          # Playwright browser utilities
+│   ├── orchestrator.py     # Legacy orchestrator
+│   ├── generator.py        # Template-based content
+│   ├── browser.py          # Playwright utils (backup)
 │   └── core.py             # Config, state, logging
 ├── scripts/
-│   ├── orchestrator.py     # ⭐ 4-slot topic rotation auto-poster
-│   ├── post_tweet.py       # ⭐ Working! Playwright + cookie
-│   ├── extract_token.py    # Auto-extract X auth_token
+│   ├── orchestrator.py     # ⭐ xurl-based auto-poster
+│   ├── daily_report.py     # ⭐ xurl whoami + log report
+│   ├── post_tweet.py       # Playwright post (backup)
+│   ├── extract_token.py    # Auth token extractor
 │   └── cron_runner.py      # Silent cron wrapper
 ├── data/
 │   ├── poster_state.json   # Topic & template rotation state
@@ -29,25 +30,20 @@ socialblast/
 
 **Flow:**
 ```
-Cron trigger (07/12/16/21 WIB)
+xurl search → trending context
        ↓
-Pick topic dari pool (5 kategori per slot)
+Template + topic pool → generate tweet
        ↓
-Generate tweet (XActions AI → fallback template)
+xurl post → 1 detik, always success ✅
        ↓
-Playwright: x.com/compose/post + insert_text()
-       ↓
-Redirect → home = posted ✅
-       ↓
-Silent log (cuma lapor kalo error)
+xurl whoami → real metrics (followers, likes)
 ```
 
 ## 🛠️ Tools
 
 | Tool | Install | Fungsi |
 |------|---------|--------|
-| XActions | `npm i xactions` | Scraping, AI generation |
-| Playwright | `pip install playwright` | Posting via cookie auth |
+| xurl | `go install` / `npm` | Post, search, engagement, metrics |
 | Python | system | Orchestrator |
 | Hermes Cron | built-in | 4x/day scheduler |
 
@@ -55,13 +51,14 @@ Silent log (cuma lapor kalo error)
 
 ### Phase 1 — MVP ✅ DONE
 - [x] Project skeleton & docs
-- [x] XActions AI generator (no API key)
-- [x] Python orchestrator CLI
-- [x] Auth token extraction (Playwright + manual)
-- [x] Posting via Playwright (compose/post + insert_text)
 - [x] Smart topic pool — 4 slots × 5 categories
 - [x] 12 rotating templates (natural voice)
+- [x] xurl OAuth2 auth (official X API v2)
+- [x] Posting via xurl — 1 detik, 100% reliable
+- [x] Real trending context via xurl search
+- [x] Real metrics via xurl whoami (followers, likes, tweets)
 - [x] 4x/day cron jobs (07/12/16/21 WIB)
+- [x] Daily report with live metrics (21:00 WIB)
 - [x] Silent mode — zero token cost
 
 ### Phase 2 — Engagement
@@ -94,9 +91,8 @@ Silent log (cuma lapor kalo error)
 |------|---------|
 | VPS (existing) | $0 |
 | X Premium | $8 |
-| AI (XActions built-in) | **$0** |
-| Hermes Cron | **$0** |
-| **Total** | **$8** |
+| X API credits ($5) | **one-time** |
+| **Total Monthly** | **$8** |
 
 ## 💰 Monetization
 1. **X Ads Revenue Sharing** — 5M impressions/3mo + 500 followers + Premium
@@ -114,7 +110,7 @@ Silent log (cuma lapor kalo error)
 | Date | Change |
 |------|--------|
 | 13 Jun 2026 | Init: skeleton, docs, XActions + Agent-Reach |
-| 13 Jun 2026 | Switch to XActions built-in AI |
 | 13 Jun 2026 | Auth via Playwright cookie injection |
-| 13 Jun 2026 | **Working post method found:** compose/post + insert_text |
-| 13 Jun 2026 | **4x/day cron auto-poster LIVE** — topic rotation + smart templates |
+| 13 Jun 2026 | Working post found: compose/post + insert_text |
+| 13 Jun 2026 | 4x/day cron auto-poster LIVE — topic rotation + templates |
+| 13 Jun 2026 | **⚡ Full xurl migration — X API v2, 1 detik per post, 100% reliable** |

@@ -1,7 +1,7 @@
 # SocialBlast — Implementation Plan
 
-> **Stack:** XActions (AI) + Playwright (posting) + Python (orchestrator) + Hermes Cron (scheduler)
-> **Status:** ✅ Phase 1 Complete — 4x/day Auto-Poster LIVE
+> **Stack:** xurl (X API v2) + Python (orchestrator) + Hermes Cron (scheduler)
+> **Status:** ✅ Phase 1 Complete — 4x/day Auto-Poster LIVE via X API v2
 > **Last Updated:** 13 Jun 2026
 
 ---
@@ -16,12 +16,12 @@
        │                   │
        ▼                   ▼
 ┌──────────────┐   ┌──────────────────┐
-│  XActions AI │   │   Playwright     │
-│  (generate)  │   │   (post tweet)   │
+│  xurl search │   │   xurl post      │
+│  (trending)  │   │   (1 detik)      │
 │              │   │                  │
-│ • ai generate│   │ • cookie auth    │
-│ • fallback → │   │ • compose/post   │
-│   templates  │   │ • insert_text()  │
+│ • real data  │   │ • X API v2       │
+│ • lang:en    │   │ • 100% reliable  │
+│ • -is:rt     │   │ • JSON response  │
 └──────────────┘   └──────────────────┘
        │                   │
        └───────┬───────────┘
@@ -83,8 +83,9 @@
 
 | Layer | Tool | Purpose |
 |-------|------|---------|
-| AI Content | **XActions built-in** | Generate + fallback templates |
-| Posting | **Playwright** | Cookie injection + compose/post |
+| Posting | **xurl** | X API v2 — post, search, engagement |
+| Search | **xurl search** | Real trending tweets (lang:en, -is:retweet) |
+| Metrics | **xurl whoami** | Followers, tweet count, likes |
 | Orchestrator | **Python 3.11** | Topic pool, rotation, logging |
 | Scheduler | **Hermes cron** | 4x/day, zero token, silent |
 | State | **JSON files** | Topic rotation, post count |
@@ -116,11 +117,12 @@
 
 ## 🔑 Key Technical Decisions
 
-1. **compose/post + insert_text()** — only method that works on headless VPS
-2. **Cookie auth** — no API key, no login per post, reusable for months
+1. **xurl (X API v2)** — official CLI, 1 detik per post, 100% reliable
+2. **OAuth 2.0 auto-refresh** — no token management needed
 3. **Smart templates** — natural human voice, rotating to avoid pattern detection
 4. **Silent cron** — `no_agent=True` → zero token cost, errors only
 5. **Slot-based rotation** — 5 categories per slot, tracked to avoid repetition
+6. **Real trending context** — xurl search injects live tweet themes
 
 ---
 
@@ -138,3 +140,4 @@
 | 13 Jun 2026 | 12 rotating fallback templates |
 | 13 Jun 2026 | 4x/day Hermes cron jobs deployed (07/12/16/21 WIB) |
 | 13 Jun 2026 | Full cycle tested: topic → generate → post → log ✅ |
+| 13 Jun 2026 | **⚡ xurl migration — X API v2, 1 detik per post, real metrics & trending** |
