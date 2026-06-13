@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Script 3: Reply Helper — Human-in-the-Loop (xurl edition)
-Cari tweet bagus di niche → OpenAI draft reply → lo approve → baru post via xurl
+Script 3: Reply Helper — Human-in-the-Loop (xurl + OpenRouter)
+Cari tweet bagus di niche → OpenRouter AI draft → lo approve → post via xurl
 PENTING: Script ini TIDAK auto-post tanpa approval lo
 """
 
@@ -43,14 +43,17 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-# ─── OPENAI CLIENT ────────────────────────────────────────────────────────────
+# ─── OPENROUTER CLIENT ────────────────────────────────────────────────────────
 def get_openai_client():
     from openai import OpenAI
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        log.error("OPENAI_API_KEY tidak ditemukan di environment")
+        log.error("OPENROUTER_API_KEY tidak ditemukan di environment")
         return None
-    return OpenAI(api_key=api_key)
+    return OpenAI(
+        api_key=api_key,
+        base_url="https://openrouter.ai/api/v1",
+    )
 
 # ─── STATE ────────────────────────────────────────────────────────────────────
 STATE_FILE   = DATA_DIR / "reply_state.json"
@@ -144,7 +147,7 @@ def generate_reply_draft(tweet_text: str, author: str, client) -> str | None:
     """Generate draft reply pakai OpenAI."""
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="openai/gpt-4o-mini",  # hemat via OpenRouter
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"Tweet dari @{author}:\n\n{tweet_text}"}

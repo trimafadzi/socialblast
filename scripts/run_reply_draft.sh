@@ -1,3 +1,3 @@
 #!/bin/bash
-# Cron wrapper: Generate reply drafts — OpenAI → pending_replies.json
-cd /root/socialblast && python3 scripts/3_reply_helper.py --draft
+# Cron wrapper: Generate reply drafts — OpenRouter → pending_replies.json
+cd /root/socialblast && source .env 2>/dev/null && python3 scripts/3_reply_helper.py --draft
