@@ -1,0 +1,9 @@
+# SocialBlast — X/Twitter Automation Bot
+# Core dependencies
+
+playwright>=1.40.0
+schedule>=1.2.0
+python-dotenv>=1.0.0
+openai>=1.0.0
+httpx>=0.25.0
+rich>=13.0.0
