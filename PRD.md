@@ -61,29 +61,39 @@ xurl whoami → real metrics (followers, likes)
 - [x] Daily report with live metrics (21:00 WIB)
 - [x] Silent mode — zero token cost
 
-### Phase 2 — Engagement
-- [ ] XActions AI voice analysis
-- [ ] Auto-reply trending tweets
-- [ ] Like & follow
-- [ ] Rate limit protection
+### Phase 2 — Growth (Conservative)
+- [ ] Shadowban monitoring — cron tiap 2 hari cek search visibility
+- [ ] Engagement script — search trending → like → log (≤50 likes/hari)
+- [ ] Smart follow — 10-15/hari, crypto niche, random delay 30-120s
+- [ ] Reply assistant — AI draft → **human review** → post (≤5/hari ke akun besar)
+- [ ] Content pipeline — 5-10 AI drafts/hari, Bos approve yang terbaik
+- [ ] Random jitter — semua aksi anti-pattern detection
 
-### Phase 3 — Scale
-- [ ] Multi-account
-- [ ] Thread auto-post
-- [ ] Analytics dashboard
+### Phase 3 — Content Scale
+- [ ] Thread generator — 5-7 tweet threads (AI draft → review → post)
+- [ ] Visual content — chart screenshots + commentary
+- [ ] A/B test timing — geser jam posting berdasarkan engagement data
+- [ ] Voice refinement — 1 bulan performance data → optimize templates
 
 ### Phase 4 — Monetize
-- [ ] X Ads Revenue Sharing
+- [ ] X Ads Revenue Sharing — 5M impressions/3mo + 500 followers + Premium
 - [ ] Revenue tracking
+- [ ] (Optional) Account flipping — jual akun established
 
 ## 📊 Target
 
 | Metric | Launch | Month 1 | Month 3 |
 |--------|--------|---------|---------|
-| Akun | 1 | 3 | 5 |
-| Posts/hari | 4 | 8 | 12 |
-| Followers | 0 | 200 | 1K+ |
-| Impressions | 0 | 100K | 1M+ |
+| Followers | 0 | 50-150 | 500+ |
+| Posts/hari | 4 | 4-6 | 6-8 |
+| Engagement rate | 0% | 1-2% | 3-5% |
+| Likes/hari (outbound) | 0 | 20-30 | 40-50 |
+
+## ⚠️ Risiko
+- **Shadowban** — detection algo makin ketat. Mitigation: warm-up, random delay, human review
+- **X rate limit** — Basic API tier ketat. Mitigation: ≤50 likes, ≤15 follows, ≤5 replies/hari
+- **Content quality** — full AI = obvious. Mitigation: human-in-the-loop pipeline
+- **Account suspension** — new account + aggressive = red flag. Mitigation: minggu 1 manual
 
 ## 💰 Cost
 
@@ -99,12 +109,6 @@ xurl whoami → real metrics (followers, likes)
 2. **Affiliate links** — sisipin di reply
 3. **Account flipping** — jual akun established
 
-## ⚠️ Risiko
-- Shadowban / account ban
-- X auth_token expired
-- X rate limit (cookie-based)
-- Playwright EPIPE (mitigated: compose/post URL)
-
 ## 📝 Changelog
 
 | Date | Change |
@@ -114,3 +118,4 @@ xurl whoami → real metrics (followers, likes)
 | 13 Jun 2026 | Working post found: compose/post + insert_text |
 | 13 Jun 2026 | 4x/day cron auto-poster LIVE — topic rotation + templates |
 | 13 Jun 2026 | **⚡ Full xurl migration — X API v2, 1 detik per post, 100% reliable** |
+| 13 Jun 2026 | **📋 Revised Phase 2-4 — conservative growth, anti-detection, human-in-the-loop** |

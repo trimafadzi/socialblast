@@ -109,9 +109,9 @@
 |------|---------|
 | VPS (existing) | $0 |
 | X Premium | $8 |
-| AI (XActions built-in) | **$0** |
+| X API credits ($5) | **one-time** |
 | Hermes Cron | **$0** |
-| **Total** | **$8** |
+| **Total Monthly** | **$8** |
 
 ---
 
@@ -123,6 +123,48 @@
 4. **Silent cron** — `no_agent=True` → zero token cost, errors only
 5. **Slot-based rotation** — 5 categories per slot, tracked to avoid repetition
 6. **Real trending context** — xurl search injects live tweet themes
+
+---
+
+## 🌱 Phase 2 — Conservative Growth Strategy
+
+### ⚠️ Anti-Detection Principles
+| Principle | Rule |
+|-----------|------|
+| Warm-up | Akun baru: minggu 1 manual/organic, bot start minggu 2 |
+| Random delay | Semua aksi pakai random jitter 30-120 detik antar call |
+| Natural pattern | No burst at :00/:15/:30/:45 — human-like timing |
+| Rate cap | Follow ≤15/hari, like ≤50/hari, reply ≤5/hari ke akun besar |
+| Shadowban check | Tiap 2 hari: search `from:QuantumFomo` + cek via shadowban.io |
+
+### Build Order (Low Risk → High Risk)
+| # | Script | Risk | Timeline |
+|---|--------|------|----------|
+| 1 | `engagement.py` — search trending → like → log | 🟢 Low | Sekarang |
+| 2 | `smart_follow.py` — follow 10-15/hari, crypto niche, random delay | 🟡 Medium | Minggu 1 |
+| 3 | `reply_assistant.py` — cari momen → draft reply → **human review → post** | 🔴 High | Minggu 2 |
+
+### Realistic Growth Targets (Revised)
+| Metric | Now | Month 1 | Month 3 |
+|--------|-----|---------|---------|
+| Followers | 0 | 50-150 | 500+ |
+| Engagement Rate | 0% | 1-2% | 3-5% |
+| Posts/hari | 4 | 4-6 | 6-8 |
+| Likes/hari (outbound) | 0 | 20-30 | 40-50 |
+| Follows/hari | 0 | 5-10 | 10-15 |
+
+### Content Pipeline (Human-in-the-Loop)
+```
+xurl search (trending) → AI draft → Bos review → xurl post
+                          ↑                      ↑
+                     bulk generate          manual approve
+                     (5-10 draft/hari)      (yang terbaik aja)
+```
+
+### Shadowban Monitoring
+- Cron tiap 2 hari: `xurl search "from:QuantumFomo"` → cek apakah tweet muncul di search
+- Manual cross-check via shadowban.io
+- Alert via daily report kalo ada indikasi suppression
 
 ---
 
@@ -141,3 +183,4 @@
 | 13 Jun 2026 | 4x/day Hermes cron jobs deployed (07/12/16/21 WIB) |
 | 13 Jun 2026 | Full cycle tested: topic → generate → post → log ✅ |
 | 13 Jun 2026 | **⚡ xurl migration — X API v2, 1 detik per post, real metrics & trending** |
+| 13 Jun 2026 | **📋 Conservative growth strategy — anti-detection, warm-up, human-in-the-loop** |
