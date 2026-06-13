@@ -147,7 +147,7 @@ def generate_reply_draft(tweet_text: str, author: str, client) -> str | None:
     """Generate draft reply pakai OpenAI."""
     try:
         response = client.chat.completions.create(
-            model="openai/gpt-4o-mini",  # hemat via OpenRouter
+            model="google/gemini-2.0-flash-001",  # GRATIS via OpenRouter
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"Tweet dari @{author}:\n\n{tweet_text}"}
