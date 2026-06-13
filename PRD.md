@@ -77,7 +77,7 @@ xurl whoami → real metrics (followers, likes)
 - [x] Shadowban monitoring — cron tiap 2 hari cek search visibility
 - [x] Engagement script — search trending → like → log (8 likes/run, 16/hari)
 - [x] Smart follow — 5/run, 15/hari, crypto niche, random delay 30-90s
-- [x] Reply assistant — AI draft (OpenAI) → **human review** → post (≤5/hari)
+| Reply assistant — AI draft (OpenRouter, Gemini Flash free) → **human review** → post (≤5/hari)
 - [x] Content pipeline — 5-10 AI drafts/hari, Bos approve via `--review`
 - [x] Random jitter — semua aksi anti-pattern detection (startup + antar-call)
 - [x] Cron deployment — 4 Hermes cron jobs (08:00/10:00/11:00/19:00 WIB)
@@ -134,3 +134,4 @@ xurl whoami → real metrics (followers, likes)
 | 13 Jun 2026 | **📋 Revised Phase 2-4 — conservative growth, anti-detection, human-in-the-loop** |
 | 13 Jun 2026 | **🔥 Phase 2 scripts built — engagement, follow, reply helper (xurl edition)** |
 | 13 Jun 2026 | **⏰ 4 growth cron jobs deployed — engagement 2x, follow 1x, drafts 1x** |
+| 13 Jun 2026 | **🆓 OpenRouter free tier — Gemini Flash, $0 AI cost** |

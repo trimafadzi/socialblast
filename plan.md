@@ -56,7 +56,7 @@
 |---|------|--------|-------|
 | 2.1 | Engagement script | ✅ | `1_engagement_cron.py` — 8 likes/run, 2x/day, 8-20s delay |
 | 2.2 | Smart follow | ✅ | `2_smart_follow.py` — 15/day, seed followers, 30-90s delay |
-| 2.3 | Reply helper (draft) | ✅ | `3_reply_helper.py --draft` — OpenAI → pending_replies.json |
+| 2.3 | Reply helper (draft) | ✅ | `3_reply_helper.py --draft` — OpenRouter (Gemini Flash, free) → pending_replies.json |
 | 2.4 | Reply helper (review) | ✅ | `3_reply_helper.py --review` — human approve/edit/skip |
 | 2.5 | Cron deployment | ✅ | 4 growth cron jobs (08:00/10:00/11:00/19:00 WIB) |
 | 2.6 | Shadowban monitoring | ⏳ | Next: cron tiap 2 hari cek search visibility |
@@ -88,6 +88,7 @@
 | Posting | **xurl** | X API v2 — post, search, engagement |
 | Search | **xurl search** | Real trending tweets (lang:en, -is:retweet) |
 | Metrics | **xurl whoami** | Followers, tweet count, likes |
+| AI Drafts | **OpenRouter** | Gemini 2.0 Flash — free tier, 5 drafts/hari |
 | Orchestrator | **Python 3.11** | Topic pool, rotation, logging |
 | Scheduler | **Hermes cron** | 4x/day, zero token, silent |
 | State | **JSON files** | Topic rotation, post count |
@@ -153,7 +154,7 @@
 |---|--------|------|----------|
 | 1 | `1_engagement_cron.py` — search trending → like → log | 🟢 Low | ✅ Deployed |
 | 2 | `2_smart_follow.py` — follow 5/run, 15/hari, crypto niche | 🟡 Medium | ✅ Deployed |
-| 3 | `3_reply_helper.py` — OpenAI draft → **human review → post** | 🔴 High | ✅ Deployed |
+| 3 | `3_reply_helper.py` — OpenRouter (Gemini Flash, free) → **human review → post** | 🔴 High | ✅ Deployed |
 
 ### Realistic Growth Targets (Revised)
 | Metric | Now | Month 1 | Month 3 |
@@ -197,3 +198,4 @@ xurl search (trending) → AI draft → Bos review → xurl post
 | 13 Jun 2026 | **📋 Conservative growth strategy — anti-detection, warm-up, human-in-the-loop** |
 | 13 Jun 2026 | **🔥 Phase 2 scripts built — engagement, follow, reply helper (xurl edition)** |
 | 13 Jun 2026 | **⏰ 4 growth cron jobs deployed — engagement 2x, follow 1x, drafts 1x** |
+| 13 Jun 2026 | **🆓 AI switched to OpenRouter free tier — Gemini 2.0 Flash, $0 cost** |
