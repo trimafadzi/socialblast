@@ -16,7 +16,11 @@ import sys
 import random
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 from string import Template
+
+# Playwright imports untuk fallback posting method
+from playwright.sync_api import sync_playwright
 
 # ── Config ────────────────────────────────────────────────────────────────────
 TEMPLATE_FILE  = "data/tweet_templates.json"
@@ -28,6 +32,10 @@ TOPIC_FILE     = "data/topics.json"
 DAILY_LIMIT    = 4
 MIN_DELAY_SECS = 30
 MAX_DELAY_SECS = 90
+
+# Image config
+IMAGE_DIR      = "data/images"
+IMAGE_CHANCE   = 0.4  # 40% chance to attach image
 # ──────────────────────────────────────────────────────────────────────────────
 
 # Coins pool + price levels untuk placeholder
@@ -163,14 +171,87 @@ def select_template(templates: dict, weights: dict[str, float],
     return chosen_type, chosen_template
 
 
-def post_tweet(text: str) -> bool:
-    """Post tweet via xurl."""
+def post_tweet(text: str, image_path: str | None = None) -> bool:
+    """Post tweet via Playwright (primary) dengan fallback ke xurl.
+    Jika image_path diberikan, attach gambar ke tweet."""
+    
+    # ── Primary: Playwright via auth_token cookie ──
+    try:
+        from pathlib import Path
+        import json as _json
+        auth_file = Path.home() / ".xactions" / "auth.json"
+        if auth_file.exists():
+            token_data = _json.loads(auth_file.read_text())
+            auth_token = token_data.get("auth_token", "")
+            
+            if auth_token:
+                with sync_playwright() as p:
+                    b = p.chromium.launch(headless=True, args=['--no-sandbox'])
+                    ctx = b.new_context()
+                    ctx.add_cookies([{
+                        'name': 'auth_token', 'value': auth_token,
+                        'domain': '.x.com', 'path': '/',
+                        'httpOnly': True, 'secure': True, 'sameSite': 'Lax'
+                    }])
+                    page = ctx.new_page()
+                    
+                    page.goto('https://x.com/compose/post', wait_until='domcontentloaded', timeout=20000)
+                    page.wait_for_timeout(2000)
+                    
+                    # Upload image if provided
+                    if image_path and Path(image_path).exists():
+                        try:
+                            file_input = page.locator('input[type="file"]').first
+                            file_input.set_input_files(image_path)
+                            log(f"🖼️  Image attached: {Path(image_path).name}")
+                            # Wait for upload to complete (preview thumbnail appears)
+                            page.wait_for_timeout(3000)
+                            # Verify upload: check for remove button or thumbnail
+                            remove_btn = page.locator('[aria-label="Remove media"], [data-testid="removeMedia"]')
+                            if remove_btn.count() == 0:
+                                log("[WARN] Image upload may have failed — continuing with text only")
+                        except Exception as e:
+                            log(f"[WARN] Image upload failed: {e} — posting text only")
+                    
+                    textarea = page.locator('[data-testid="tweetTextarea_0"]')
+                    if textarea.count() == 0:
+                        log("[WARN] Playwright: no textarea found, fallback to xurl")
+                        b.close()
+                    else:
+                        textarea.first.click()
+                        page.wait_for_timeout(200)
+                        page.keyboard.insert_text(text)
+                        page.wait_for_timeout(300)
+                        
+                        post_btn = page.locator('[data-testid="tweetButton"]').first
+                        post_btn.click()
+                        page.wait_for_timeout(5000)
+                        
+                        if 'home' in page.url:
+                            b.close()
+                            extra = " + 🖼️" if image_path else ""
+                            log(f"[OK] Tweet posted via Playwright ✅{extra}")
+                            return True
+                        else:
+                            log(f"[WARN] Playwright: post unclear (url={page.url}), fallback to xurl")
+                            b.close()
+            else:
+                log("[WARN] Playwright: auth_token kosong, fallback to xurl")
+        else:
+            log("[WARN] Playwright: auth.json not found, fallback to xurl")
+    except Exception as e:
+        log(f"[WARN] Playwright failed: {e} — fallback to xurl")
+    
+    # ── Fallback: xurl CLI (text-only, no image support) ──
+    if image_path:
+        log("[INFO] xurl fallback doesn't support images — posting text only")
     try:
         result = subprocess.run(
             ["xurl", "post", text],
             capture_output=True, text=True, timeout=20
         )
         if result.returncode == 0:
+            log("[OK] Tweet posted via xurl ✅")
             return True
         log(f"[ERROR] xurl post failed: {result.stderr.strip()[:100]}")
         return False
@@ -231,7 +312,23 @@ def main():
         sys.exit(0)
 
     # Post!
-    success = post_tweet(tweet_text)
+    # ── Random image selection (40% chance) ──
+    image_path = None
+    if random.random() < IMAGE_CHANCE:
+        img_dir = Path(IMAGE_DIR)
+        if img_dir.exists():
+            images = list(img_dir.glob("*.jpg")) + list(img_dir.glob("*.jpeg")) + list(img_dir.glob("*.png"))
+            if images:
+                image_path = str(random.choice(images))
+                log(f"🖼️  Image roulette: ATTACH ({Path(image_path).name})")
+            else:
+                log("🖼️  Image roulette: no images found in data/images/")
+        else:
+            log("🖼️  Image roulette: data/images/ not found")
+    else:
+        log("🖼️  Image roulette: SKIP (text-only post)")
+    
+    success = post_tweet(tweet_text, image_path)
 
     if success:
         posted_state["count"] += 1
