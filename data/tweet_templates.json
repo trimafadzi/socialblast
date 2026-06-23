@@ -1,95 +1,95 @@
 {
   "_meta": {
-    "version": "2.0",
+    "version": "2.1",
     "total_templates": 48,
     "types": ["question", "hot_take", "prediction", "price_action", "data_insight", "thread_hook", "announcement", "story", "comparison", "general"],
     "placeholders": {
-      "{COIN}": "dari coins list (BTC/ETH/SOL dll)",
-      "{PERCENT}": "random dari range sesuai konteks",
-      "{TIMEFRAME}": "short/medium/long term atau hari/minggu/bulan",
-      "{LEVEL}": "harga level teknikal",
+      "{COIN}": "from coins list (BTC/ETH/SOL etc)",
+      "{PERCENT}": "random from context-appropriate range",
+      "{TIMEFRAME}": "short/medium/long term or days/weeks/months",
+      "{LEVEL}": "technical price level",
       "{EVENT}": "market event / catalyst"
     }
   },
 
   "question": [
-    "Kalau harus pilih satu, kamu hold {COIN} atau cash untuk {TIMEFRAME} ke depan?\n\nAlasannya?",
-    "Hot take dari gue: kebanyakan trader rugi bukan karena salah beli, tapi salah JUAL.\n\nSepakat atau nggak?",
-    "Satu pertanyaan yang jarang ditanya:\n\nKalau market crash 50% besok — portfolio kamu survive berapa bulan?\n\nJujur aja 👇",
-    "Pertanyaan serius:\n\nAda yang masih pake technical analysis di crypto?\n\nAtau udah nyerah dan YOLO aja? 💀",
-    "Poll mental:\n\nKamu lebih suka untung 30% dari alt musiman\natau untung 10% stabil dari {COIN} tiap bulan?\n\nJelaskan strategi kamu ⬇️",
-    "Gue curious:\n\nTrader yang profitable jangka panjang itu 80% karena skill atau 80% karena timing masuk market?\n\nData bilang apa menurut kamu?",
-    "Siapa yang masih ingat pertama kali beli crypto?\n\nCoin apa, tahun berapa, untung atau rugi? 😅\n\nDrop di bawah, gue baca semua"
+    "If you had to pick one, are you holding {COIN} or cash for the {TIMEFRAME} ahead?\n\nWhy?",
+    "Hot take: most traders lose money not because they bought wrong, but because they SOLD wrong.\n\nAgree or disagree?",
+    "One question nobody asks enough:\n\nIf the market crashes 50% tomorrow — how many months does your portfolio survive?\n\nBe honest 👇",
+    "Serious question:\n\nIs anyone still using technical analysis in crypto?\n\nOr did you give up and just YOLO? 💀",
+    "Mental poll:\n\nWould you rather make 30% from a seasonal alt\nor a steady 10% monthly from {COIN}?\n\nExplain your strategy ⬇️",
+    "I'm curious:\n\nAre long-term profitable traders 80% skill or 80% market timing?\n\nWhat does the data say in your experience?",
+    "Who still remembers their first crypto buy?\n\nWhat coin, what year, profit or loss? 😅\n\nDrop it below, I'll read every reply"
   ],
 
   "hot_take": [
-    "Unpopular opinion:\n\n{COIN} di {LEVEL} ini bukan entry bagus — ini jebakan bull trap.\n\nThread singkat kenapa 🧵👇",
-    "Hot take yang bakal bikin banyak orang marah:\n\nAltcoin season 2025 sudah selesai sebelum banyak orang sadar dimulainya.\n\nChange my mind.",
-    "Kontrarian view:\n\nKalau semua orang bilang 'beli the dip', itu biasanya bukan dip terakhir.\n\n{COIN} punya satu lagi sebelum reversal.",
-    "Gue capek lihat konten 'crypto guru' di sini.\n\nMereka prediksi benar 1x, salah 9x, tapi follower terus percaya.\n\nWhy? 🤔",
-    "Jujur banget:\n\nLebih banyak orang kaya dari ngajarin trading daripada dari trading itu sendiri.\n\nThis is the real alpha.",
-    "Controversial take:\n\nDeFi tidak akan mainstream selama UX-nya masih worse dari internet banking 2010.\n\nSampai ada yang fix ini, adopsi stagnan."
+    "Unpopular opinion:\n\n{COIN} at {LEVEL} is NOT a good entry — this is a bull trap.\n\nQuick thread on why 🧵👇",
+    "Hot take that's gonna make a lot of people mad:\n\nAltcoin season 2025 was over before most people even realized it started.\n\nChange my mind.",
+    "Contrarian view:\n\nWhen everyone's saying 'buy the dip', it's usually not the final dip.\n\n{COIN} has one more leg down before the reversal.",
+    "I'm tired of seeing 'crypto guru' content here.\n\nThey're right 1 out of 10 times, wrong 9 times, and followers still trust them.\n\nWhy? 🤔",
+    "Brutal honesty:\n\nMore people got rich teaching trading than from actual trading.\n\nThis is the real alpha.",
+    "Controversial take:\n\nDeFi won't go mainstream until its UX stops being worse than 2010 internet banking.\n\nUntil someone fixes that, adoption stays stagnant."
   ],
 
   "prediction": [
-    "{COIN} — prediksi 30 hari ke depan:\n\n📌 Support kuat: {LEVEL}\n📌 Target realistis: {LEVEL}\n📌 Invalidasi kalau: di bawah {LEVEL}\n\nBukan financial advice. Track bareng gue.",
-    "Gue taruh prediksi ini di sini biar bisa dikunci:\n\nBefore end of month — {COIN} akan test {LEVEL} lagi.\n\n⏰ Set reminder. Kita lihat bareng.",
-    "Market cycle prediction:\n\nFase sekarang = accumulation phase late stage.\nNext 60-90 hari = markup.\n\nYang salah masuk timing sekarang akan menyesal {TIMEFRAME} lagi.",
-    "Satu prediksi yang gue confident:\n\n{COIN} belum pump proper di cycle ini.\n\nMasih ada satu momentum besar sebelum akhir tahun. Watch closely.",
-    "Macro view gue untuk Q3:\n\n• BTC dominance naik dulu\n• Alt season minor setelah itu\n• {COIN} adalah dark horse paling underrated\n\nSave tweet ini. Kita cross-check 90 hari lagi."
+    "{COIN} — 30-day outlook:\n\n📌 Strong support: {LEVEL}\n📌 Realistic target: {LEVEL}\n📌 Invalidated if: below {LEVEL}\n\nNot financial advice. Track it with me.",
+    "Locking this prediction in now so it can't be edited:\n\nBefore month end — {COIN} will retest {LEVEL}.\n\n⏰ Set a reminder. Let's watch together.",
+    "Market cycle prediction:\n\nCurrent phase = late-stage accumulation.\nNext 60-90 days = markup phase.\n\nWrong timing now = regret for the next {TIMEFRAME}.",
+    "One prediction I'm confident about:\n\n{COIN} hasn't had its proper pump this cycle yet.\n\nStill has one big momentum move before year end. Watch closely.",
+    "My macro view for Q3:\n\n• BTC dominance rises first\n• Minor alt season after that\n• {COIN} is the most underrated dark horse\n\nSave this tweet. Cross-check in 90 days."
   ],
 
   "price_action": [
-    "{COIN} baru saja test {LEVEL} untuk ketiga kalinya.\n\nSecara teknikal — triple test biasanya precede breakout atau breakdown.\n\nGue monitor ketat 24 jam ke depan. 👁️",
-    "Volume spike {COIN} +{PERCENT}% tanpa news yang jelas.\n\nIni biasanya artinya salah satu:\n1. Smart money accumulate\n2. Whale games sebelum pump\n3. Manipulasi murni\n\nKamu baca gimana?",
-    "Update singkat:\n\n{COIN} tembus {LEVEL} — level yang udah jadi resistance 3 bulan terakhir.\n\nKalau hold di atas ini 24 jam, target berikutnya {LEVEL}.\nKalau gagal, back to {LEVEL}.\n\nNo FOMO.",
-    "Level kritis yang perlu kamu watch untuk {COIN}:\n\n🟢 Bull case: hold {LEVEL}\n🔴 Bear case: loss {LEVEL}\n\nSekarang lagi di tengah-tengah. Crucial zone.",
-    "Catatan hari ini:\n\n{COIN} setup yang menarik — higher low terbentuk setelah {PERCENT}% koreksi.\n\nBelum konfirmasi, tapi ini awal dari potential trend reversal. Watchlist priority."
+    "{COIN} just tested {LEVEL} for the third time.\n\nTechnically — triple tests usually precede a breakout or breakdown.\n\nMonitoring closely for the next 24 hours. 👁️",
+    "Volume spike on {COIN} +{PERCENT}% with no clear news.\n\nThis usually means one of:\n1. Smart money accumulating\n2. Whale games before a pump\n3. Pure manipulation\n\nHow do you read it?",
+    "Quick update:\n\n{COIN} broke through {LEVEL} — a 3-month resistance.\n\nIf it holds above this for 24h, next target is {LEVEL}.\nIf it fails, back to {LEVEL}.\n\nNo FOMO.",
+    "Critical levels to watch for {COIN}:\n\n🟢 Bull case: holds {LEVEL}\n🔴 Bear case: loses {LEVEL}\n\nRight in the middle now. Crucial zone.",
+    "Today's note:\n\n{COIN} has an interesting setup — higher low forming after a {PERCENT}% correction.\n\nNot confirmed yet, but this is the start of a potential trend reversal. Watchlist priority."
   ],
 
   "data_insight": [
-    "Data menarik yang sering diabaikan:\n\nHistoris {COIN} setelah {EVENT} = rata-rata +{PERCENT}% dalam 30 hari.\n\nSample size kecil, tapi pola ini konsisten 4x dari 5x. Track record is data.",
-    "Gue habiskan weekend ngitung ini:\n\nTrader yang set hard stop loss di -15% punya survival rate 3x lebih tinggi dari yang nggak pake SL sama sekali.\n\nData nggak bohong.",
-    "Insight dari 6 bulan tracking market:\n\nHari dengan volume terendah dalam seminggu (biasanya Sabtu/Minggu) = false signal paling banyak muncul.\n\nJangan overtrade weekend. Seriously.",
-    "Funding rate {COIN} sekarang: extremely negative.\n\nHistoris: ketika funding rate < -0.05%, {COIN} pump {PERCENT}% dalam 7 hari berikutnya di 7 dari 10 kasus.\n\nContrarian play yang worth watching.",
-    "Kecil tapi penting:\n\nOpen interest {COIN} naik {PERCENT}% minggu ini sementara price flat.\n\nArtinya ada yang build position besar secara diam-diam. Biasanya precede big move dalam 1-2 minggu."
+    "Overlooked data point:\n\nHistorically {COIN} after {EVENT} = average +{PERCENT}% within 30 days.\n\nSmall sample, but pattern held 4 out of 5 times. Track record is data.",
+    "I spent the weekend crunching this:\n\nTraders who set a hard stop loss at -15% have a 3x higher survival rate than those with none.\n\nData doesn't lie.",
+    "Insight from 6 months of market tracking:\n\nThe lowest volume day of the week (usually Sat/Sun) = most false signals.\n\nDon't overtrade weekends. Seriously.",
+    "{COIN} funding rate right now: extremely negative.\n\nHistorically: when funding rate < -0.05%, {COIN} pumped {PERCENT}% in the following 7 days in 7 out of 10 cases.\n\nWorth watching as a contrarian play.",
+    "Small but important:\n\n{COIN} open interest up {PERCENT}% this week while price is flat.\n\nSomeone's quietly building a big position. Usually precedes a big move in 1-2 weeks."
   ],
 
   "thread_hook": [
-    "🧵 Gue habiskan 2 minggu research {COIN} — ini yang gue temukan:\n\n(Thread yang probably bikin kamu rethink portfolio kamu)",
-    "🧵 5 kesalahan paling mahal yang gue lihat trader crypto buat — dan gue pernah melakukan semua ini:\n\n1/",
-    "🧵 Kenapa {PERCENT}% trader crypto selalu kalah padahal mereka rajin analisa?\n\nBukan masalah skill. Ini masalah sistem.\n\nThread 👇",
-    "🧵 Gue trace performance 20 crypto influencer terbesar selama 12 bulan.\n\nHasilnya mengejutkan (dan sedikit memalukan untuk industri ini):\n\n1/",
-    "🧵 Panduan praktis buat yang mau mulai DCA crypto tapi bingung:\n\n• Berapa alokasi?\n• Coin mana?\n• Frekuensi?\n• Exit strategy?\n\nThread lengkap 👇"
+    "🧵 I spent 2 weeks researching {COIN} — here's what I found:\n\n(A thread that might make you rethink your portfolio)",
+    "🧵 5 most expensive mistakes I see crypto traders make — and I've made every single one:\n\n1/",
+    "🧵 Why {PERCENT}% of crypto traders always lose despite grinding analysis?\n\nIt's not a skill problem. It's a system problem.\n\nThread 👇",
+    "🧵 I tracked the performance of 20 major crypto influencers over 12 months.\n\nThe results are surprising (and a little embarrassing for this industry):\n\n1/",
+    "🧵 Practical guide for anyone wanting to start DCA crypto but confused:\n\n• How much to allocate?\n• Which coins?\n• What frequency?\n• Exit strategy?\n\nFull thread 👇"
   ],
 
   "announcement": [
-    "PSA untuk crypto holders:\n\n{EVENT} lagi sekitar {TIMEFRAME} lagi.\n\nKamu sudah siapkan strategi? Ini yang perlu diperhatikan 👇",
-    "Reminder penting yang banyak orang lupa:\n\nSekedar hold {COIN} tanpa position sizing yang jelas bukan strategy — itu gambling dengan extra steps.\n\nHave a plan.",
-    "Alert:\n\nBeberapa dapp besar di ekosistem {COIN} sedang maintenance bersamaan.\n\nBukan bearish signal, tapi worth monitoring kalau kamu ada open position.",
-    "Weekly reset checklist yang gue pakai:\n\n✅ Review profit/loss minggu ini\n✅ Cek apakah thesis masih valid\n✅ Rebalance kalau perlu\n✅ Set alert untuk level kritis\n\nTemplate bebas dipakai."
+    "PSA for crypto holders:\n\n{EVENT} is about {TIMEFRAME} away.\n\nGot your strategy ready? Here's what to watch 👇",
+    "Important reminder most people forget:\n\nJust holding {COIN} without clear position sizing isn't a strategy — it's gambling with extra steps.\n\nHave a plan.",
+    "Heads up:\n\nSeveral major dapps in the {COIN} ecosystem are undergoing maintenance at the same time.\n\nNot a bearish signal, but worth monitoring if you have open positions.",
+    "Weekly reset checklist I use:\n\n✅ Review this week's profit/loss\n✅ Check if thesis still holds\n✅ Rebalance if needed\n✅ Set alerts for critical levels\n\nFeel free to use this template."
   ],
 
   "story": [
-    "Jujur mau cerita:\n\nPertama kali gue masuk crypto, gue FOMO ke {COIN} pas ATH.\n\nSpoiler: tidak berakhir baik.\n\nApa yang gue pelajari setelah itu — mungkin berguna buat kamu juga 👇",
-    "Dulu gue pikir crypto trading itu soal menemukan 'coin yang tepat'.\n\nSekarang gue tahu yang lebih penting:\n\nPosition sizing > coin picking\n\nWaktu yang gue buang sebelum sadar ini: 18 bulan dan beberapa juta rupiah.",
-    "Cerita pendek:\n\nAda trader yang gue follow 2 tahun lalu — selalu benar, konten bagus, follower ratusan ribu.\n\nDia sekarang sudah tidak aktif posting.\n\nKarena track record akhirnya ketahuan.\n\nVerifikasi dulu sebelum percaya siapapun.",
-    "Timeline jujur 12 bulan pertama gue di crypto:\n\nBulan 1-3: Euforia, semua coin naik\nBulan 4-6: Koreksi besar, panik jual\nBulan 7-9: Belajar dari salah, mulai sistem\nBulan 10-12: Lebih tenang, mulai profit konsisten\n\nFase mana kamu sekarang?"
+    "Honest story:\n\nThe first time I got into crypto, I FOMO'd into {COIN} at ATH.\n\nSpoiler: it didn't end well.\n\nWhat I learned after that — might help you too 👇",
+    "I used to think crypto trading was about finding the 'right coin'.\n\nNow I know what matters more:\n\nPosition sizing > coin picking\n\nTime I wasted before realizing this: 18 months and thousands of dollars.",
+    "Short story:\n\nThere was a trader I followed 2 years ago — always right, great content, hundreds of thousands of followers.\n\nThey don't post anymore.\n\nBecause the track record finally caught up.\n\nVerify before trusting anyone.",
+    "Honest 12-month timeline of my first year in crypto:\n\nMonths 1-3: Euphoria, everything's up\nMonths 4-6: Big correction, panic sold\nMonths 7-9: Learned from mistakes, started building a system\nMonths 10-12: Calmer, consistent profits starting\n\nWhich phase are you in right now?"
   ],
 
   "comparison": [
-    "{COIN} vs ETH saat ini:\n\nMetric 1 — Market cap: {COIN} masih 1/10 ETH\nMetric 2 — Dev activity: {COIN} accelerating\nMetric 3 — TVL growth: {COIN} +{PERCENT}% QoQ\n\nValue case ada. Risk tetap tinggi. DYOR.",
-    "Perbedaan mindset yang bikin hasil beda:\n\nTrader amatir: 'Coin ini mau naik!'\nTrader serius: 'Kalau koreksi ke sini, reward/risk ratio oke — entry.'\n\nSatu fokus ke prediksi, satu fokus ke probabilitas.",
-    "DCA vs lump sum untuk {COIN} sekarang:\n\nDCA: cocok kalau tidak yakin timing, modal terbatas\nLump sum: cocok kalau conviction tinggi, sudah di level support kuat\n\nSituation-dependent. Tidak ada satu jawaban benar.",
-    "2021 vs 2025 — lesson yang sering terlupakan:\n\n2021: semua naik karena liquidity banjir\n2025: selektif — hanya proyek dengan fundamental yang naik proper\n\nStrategi 2021 tidak akan work di 2025. Adapt."
+    "{COIN} vs ETH right now:\n\nMetric 1 — Market cap: {COIN} still 1/10 of ETH\nMetric 2 — Dev activity: {COIN} accelerating\nMetric 3 — TVL growth: {COIN} +{PERCENT}% QoQ\n\nValue case is there. Risk remains high. DYOR.",
+    "The mindset difference that produces different results:\n\nAmateur trader: 'This coin is going up!'\nSerious trader: 'If it corrects to here, the R/R ratio is good — entry.'\n\nOne focuses on prediction, one on probability.",
+    "DCA vs lump sum for {COIN} right now:\n\nDCA: better if you're unsure on timing, limited capital\nLump sum: better if conviction is high, already at strong support\n\nSituation-dependent. No single right answer.",
+    "2021 vs 2025 — a lesson people keep forgetting:\n\n2021: everything pumped because of liquidity flood\n2025: selective — only projects with fundamentals pump properly\n\nThe 2021 playbook won't work in 2025. Adapt."
   ],
 
   "general": [
-    "Satu hal yang market selalu ajarkan:\n\nKamu bisa benar soal direction tapi salah soal timing — dan hasilnya sama saja: rugi.\n\nPatience + right thesis = actual alpha.",
-    "Crypto market di pagi ini:\n\n• Dominance BTC: steady\n• Altcoin: mixed, beberapa reversal\n• Sentiment: cautious optimism\n\nHari yang bagus buat review watchlist, bukan untuk FOMO buy.",
-    "Quote yang gue inget terus:\n\n'The market can stay irrational longer than you can stay solvent.'\n\nApply ini ke crypto dan kamu sudah punya risk management yang lebih baik dari 80% trader.",
-    "Volatilitas bukan musuh trader.\n\nMusuh sebenarnya adalah:\n• Overtrading\n• Emotional decision\n• No exit plan\n\nVolatilitas = opportunity kalau kamu punya sistem.",
-    "Update singkat dari gue:\n\nPortfolio allocation bulan ini lebih konservatif dari biasanya.\n\nBukan karena bearish — tapi karena ada beberapa setup yang belum confirm.\n\nCash is a position too.",
-    "Note to self (dan siapapun yang butuh dengar ini):\n\nHari di mana tidak trade adalah hari yang valid.\n\nNot every day has a good setup. Protect capital lebih penting dari selalu aktif."
+    "One thing the market always teaches:\n\nYou can be right on direction but wrong on timing — and the result is the same: you lose.\n\nPatience + right thesis = actual alpha.",
+    "Crypto market this morning:\n\n• BTC dominance: steady\n• Altcoins: mixed, some reversals\n• Sentiment: cautious optimism\n\nGood day to review your watchlist, not FOMO buy.",
+    "A quote I always come back to:\n\n'The market can stay irrational longer than you can stay solvent.'\n\nApply this to crypto and you're already ahead of 80% of traders on risk management.",
+    "Volatility isn't a trader's enemy.\n\nThe real enemies are:\n• Overtrading\n• Emotional decisions\n• No exit plan\n\nVolatility = opportunity if you have a system.",
+    "Quick update from me:\n\nPortfolio allocation is more conservative than usual this month.\n\nNot because I'm bearish — there are just a few setups that haven't confirmed yet.\n\nCash is a position too.",
+    "Note to self (and anyone who needs to hear this):\n\nA day without a trade is a valid day.\n\nNot every day has a good setup. Protecting capital matters more than always being active."
   ]
 }
