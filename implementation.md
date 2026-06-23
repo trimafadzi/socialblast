@@ -160,6 +160,37 @@ Setelah capai 500+ followers & 5M impressions/3 bulan:
 
 ---
 
+## 📈 Phase 2.5: Feedback Loop & Targeted Seed Replies
+
+Phase 2.5 introduces tweet performance analytics, weighted template-based posting, and high-quality reply automation targeting crypto influencers.
+
+### 1. Analytics Feedback Loop (`scripts/5_analytics.py`)
+Menganalisis performa 30 tweet terakhir dari handle X Anda, menghitung skor engagement, mengelompokkan template tweet, dan menulis hasilnya ke `data/performance_state.json`.
+- **Command:** `python3 scripts/5_analytics.py`
+
+### 2. Weighted Content Poster (`scripts/4_content_poster.py`)
+Membaca performa template dari `data/performance_state.json` untuk memilih tipe template menggunakan weighted random selection (template berkinerja tinggi dipilih lebih sering).
+- **Command:** `python3 scripts/4_content_poster.py`
+
+### 3. Targeted Seed Reply Helper (`scripts/3_reply_helper.py`)
+Melakukan reply otomatis (dengan mode manual review secara default) ke target 24 akun crypto influencer di `data/seed_accounts.json` yang dibagi menjadi 3 Tier (Mega, Mid, dan Niche Experts).
+- **Command:** `python3 scripts/3_reply_helper.py`
+
+### 4. Cron Schedules (UTC)
+Tambahkan ke `crontab -e`:
+```
+# Analytics (08:00 WIB)
+0 1 * * * cd /root/socialblast && python3 scripts/5_analytics.py >> logs/analytics.log 2>&1
+
+# Content Poster (09:00, 13:00, 18:00, 22:00 WIB)
+0 2,6,11,15 * * * cd /root/socialblast && python3 scripts/4_content_poster.py >> logs/poster.log 2>&1
+
+# Reply Helper (10:00, 21:00 WIB)
+0 3,14 * * * cd /root/socialblast && python3 scripts/3_reply_helper.py >> logs/reply.log 2>&1
+```
+
+---
+
 ## 🛟 Troubleshooting
 
 | Masalah | Solusi |

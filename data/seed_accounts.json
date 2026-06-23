@@ -1,0 +1,79 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Daftar seed accounts untuk 3_reply_helper.py. Prioritas reply ke tweet dari akun-akun ini bukan random trending.",
+    "update_guide": "Hapus akun yang tidak aktif (>2 minggu tidak tweet). Tambah akun baru yang relevan di niche yang sama.",
+    "tiers": {
+      "tier_1": "Mega influencer — reply ke sini high visibility tapi persaingan tinggi. Max 2/hari dari tier ini.",
+      "tier_2": "Mid influencer — sweet spot. Banyak engaged followers, reply masih bisa standout. Target utama.",
+      "tier_3": "Niche experts — follower sedikit tapi highly engaged. Reply sini = quality > quantity."
+    }
+  },
+
+  "tier_1": {
+    "description": "100k+ followers, crypto OG / macro analysts",
+    "daily_reply_limit": 2,
+    "accounts": [
+      { "handle": "PlanB", "niche": "BTC stock-to-flow model, on-chain analytics" },
+      { "handle": "100trillionUSD", "niche": "BTC macro, stock-to-flow creator" },
+      { "handle": "woonomic", "niche": "on-chain data, BTC market cycles" },
+      { "handle": "glassnode", "niche": "on-chain analytics, market data" },
+      { "handle": "APompliano", "niche": "BTC macro, institutional perspective" },
+      { "handle": "SatoshiLite", "niche": "LTC/BTC, crypto OG" },
+      { "handle": "VitalikButerin", "niche": "ETH tech, L2, protocol design" }
+    ]
+  },
+
+  "tier_2": {
+    "description": "10k-100k followers, active traders & analysts",
+    "daily_reply_limit": 6,
+    "accounts": [
+      { "handle": "CryptoKaleo", "niche": "TA, crypto cycles, altcoin calls" },
+      { "handle": "SmartContracter", "niche": "BTC TA, swing trading" },
+      { "handle": "IncomeSharks", "niche": "altcoin analysis, DeFi" },
+      { "handle": "CryptoCred", "niche": "TA education, trading psychology" },
+      { "handle": "AltcoinPsycho", "niche": "altcoin gems, momentum trading" },
+      { "handle": "nebraskangooner", "niche": "BTC price action, TA" },
+      { "handle": "TeddyCleps", "niche": "ETH ecosystem, DeFi analyst" },
+      { "handle": "Pentoshi", "niche": "macro crypto, portfolio construction" },
+      { "handle": "MustStopMurad", "niche": "meme coins, narrative trading" },
+      { "handle": "MessariCrypto", "niche": "research, market data, reports" }
+    ]
+  },
+
+  "tier_3": {
+    "description": "1k-10k followers, niche experts dengan engaged community",
+    "daily_reply_limit": 5,
+    "accounts": [
+      { "handle": "DeFiDave_", "niche": "DeFi protocols, yield strategies" },
+      { "handle": "TheBlock__", "niche": "crypto news, institutional flows" },
+      { "handle": "CryptoHayes", "niche": "macro, derivatives, BitMEX founder" },
+      { "handle": "Lowstrife", "niche": "ETH TA, on-chain" },
+      { "handle": "hsakatrades", "niche": "altcoin TA, Binance trader" },
+      { "handle": "lightcrypto", "niche": "BTC cycles, macro" },
+      { "handle": "DylanLeClair_", "niche": "BTC research, on-chain deep dives" }
+    ]
+  },
+
+  "reply_rules": {
+    "min_tweet_age_minutes": 5,
+    "max_tweet_age_minutes": 120,
+    "avoid_reply_if": [
+      "tweet is a retweet",
+      "tweet is a reply (not original content)",
+      "tweet contains only an image/video with no text"
+    ],
+    "prefer_reply_if": [
+      "tweet has question mark",
+      "tweet asks for opinion",
+      "tweet contains data/statistics we can add to",
+      "tweet got traction (>10 likes) but is recent (<60 min)"
+    ],
+    "quality_rules": [
+      "Reply HARUS add value — bukan 'great point!' atau sekedar agree",
+      "Tambahkan data, counter-point, atau perspective berbeda",
+      "Maksimum 1 reply per tweet dari 1 akun seed per hari",
+      "Jangan reply 2 tweet berturutan dari akun yang sama — spread out"
+    ]
+  }
+}

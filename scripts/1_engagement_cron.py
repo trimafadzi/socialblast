@@ -14,15 +14,21 @@ from datetime import datetime
 from pathlib import Path
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
+# X API v2 search operators (min_faves NOT supported — filter in code instead)
 SEARCH_QUERIES = [
-    "crypto lang:en -is:retweet min_faves:50",
-    "bitcoin lang:en -is:retweet min_faves:50",
-    "solana lang:en -is:retweet min_faves:30",
-    "ethereum lang:en -is:retweet min_faves:50",
-    "DeFi lang:en -is:retweet min_faves:30",
-    "crypto alpha lang:en -is:retweet min_faves:20",
-    "on-chain lang:en -is:retweet min_faves:20",
+    "crypto lang:en -is:retweet -is:reply",
+    "bitcoin lang:en -is:retweet -is:reply",
+    "solana lang:en -is:retweet -is:reply",
+    "ethereum lang:en -is:retweet -is:reply",
+    "DeFi lang:en -is:retweet -is:reply",
+    "crypto alpha lang:en -is:retweet -is:reply",
+    "on-chain lang:en -is:retweet -is:reply",
 ]
+
+# Quality filter: min engagement per tweet (lenient for growing account)
+MIN_LIKES = 0         # 0 = don't filter by likes (fresh tweets often have 0)
+MIN_IMPRESSIONS = 0    # 0 = don't filter by impressions
+MAX_SPAM_SCORE = 2     # skip tweets with ≥2 hashtags + cashtags (spammy)
 
 MAX_LIKES_PER_RUN = 8        # jangan langsung agresif
 DELAY_BETWEEN     = (8, 20)  # detik, randomized biar ga keliatan bot
@@ -78,10 +84,10 @@ def xurl(args: list[str]) -> dict | None:
         return None
 
 
-def search_tweets(query: str) -> list[dict]:
-    """Cari tweets via xurl. Return list tweet objects dgn id, text, username, author_id."""
+def search_tweets(query: str, max_results: int = 20) -> list[dict]:
+    """Cari tweets via xurl. Return list tweet objects dgn id, text, username, author_id, metrics."""
     log.info(f"Searching: '{query}'")
-    result = xurl(["search", query, "-n", "10"])
+    result = xurl(["search", query, "-n", str(max_results)])
     if not result:
         return []
 
@@ -95,11 +101,29 @@ def search_tweets(query: str) -> list[dict]:
         if not tid:
             continue
         author_id = str(tw.get("author_id", ""))
+        metrics = tw.get("public_metrics", {})
+        
+        # Quality filter: skip spammy tweets
+        entities = tw.get("entities", {})
+        hashtags = len(entities.get("hashtags", []))
+        cashtags = len(entities.get("cashtags", []))
+        spam_score = hashtags + cashtags
+        if spam_score > MAX_SPAM_SCORE:
+            continue
+        
+        # Quality filter: min engagement
+        likes = metrics.get("like_count", 0)
+        impressions = metrics.get("impression_count", 0)
+        if likes < MIN_LIKES and impressions < MIN_IMPRESSIONS:
+            continue
+        
         out.append({
             "id": tid,
             "text": (tw.get("text", "") or "")[:200],
             "author_id": author_id,
             "username": users.get(author_id, "unknown"),
+            "likes": likes,
+            "impressions": impressions,
         })
     return out
 
@@ -111,8 +135,8 @@ def like_tweet(tweet_id: str) -> bool:
 
 
 def random_jitter():
-    """Small random delay at start so cron runs aren't exactly on the minute."""
-    jitter = random.randint(0, 300)
+    """Small random delay at start so cron runs aren't exactly on the minute. Max 60s for cron timeout."""
+    jitter = random.randint(0, 60)
     if jitter > 0:
         log.info(f"🎲 Startup jitter: {jitter}s")
         time.sleep(jitter)

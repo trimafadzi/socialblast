@@ -56,11 +56,11 @@
 |---|------|--------|-------|
 | 2.1 | Engagement script | ✅ | `1_engagement_cron.py` — 8 likes/run, 2x/day, 8-20s delay |
 | 2.2 | Smart follow | ✅ | `2_smart_follow.py` — 15/day, seed followers, 30-90s delay |
-| 2.3 | Reply helper (draft) | ✅ | `3_reply_helper.py --draft` — OpenRouter (Gemini Flash, free) → pending_replies.json |
-| 2.4 | Reply helper (review) | ✅ | `3_reply_helper.py --review` — human approve/edit/skip |
-| 2.5 | Cron deployment | ✅ | 4 growth cron jobs (08:00/10:00/11:00/19:00 WIB) |
-| 2.6 | Shadowban monitoring | ⏳ | Next: cron tiap 2 hari cek search visibility |
-| 2.7 | Rate limit tuning | ⏳ | Monitor after 1 week, adjust if needed |
+| 2.3 | Reply helper (draft) | ✅ | `3_reply_helper.py` updated to target quality-first seed accounts |
+| 2.4 | Reply helper (review) | ✅ | Manual review mode default (logs/console verification) |
+| 2.5 | Cron deployment | ✅ | Deployed cron schedules for analytics, poster, and reply |
+| 2.6 | Feedback Loop (Analytics) | ✅ | `5_analytics.py` for computed template performance weights |
+| 2.7 | Weighted Content Poster | ✅ | `4_content_poster.py` selects templates via performance rankings |
 
 ### 🟢 Phase 3 — Scale (Target: Minggu 3-4)
 
@@ -200,3 +200,7 @@ xurl search (trending) → AI draft → Bos review → xurl post
 | 13 Jun 2026 | **⏰ 4 growth cron jobs deployed — engagement 2x, follow 1x, drafts 1x** |
 | 13 Jun 2026 | **🆓 AI switched to OpenRouter free tier — Gemini 2.0 Flash, $0 cost** |
 | 13 Jun 2026 | **🎲 Content jitter — random 0-30 menit sebelum auto-post (anti-detection)** |
+| 23 Jun 2026 | **Phase 2.5 COMPLETE: Feedback Loop Analytics & Targeted Seed Replies** |
+| 23 Jun 2026 | Integrated `5_analytics.py` and `4_content_poster.py` for weighted template selection |
+| 23 Jun 2026 | Switched `3_reply_helper.py` to seed_accounts list targeting for higher quality replies |
+| 23 Jun 2026 | Corrected CLI bugs for all scripts to match actual local `xurl` commands |

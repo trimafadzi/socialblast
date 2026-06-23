@@ -1,319 +1,347 @@
 #!/usr/bin/env python3
 """
-Script 3: Reply Helper — Human-in-the-Loop (xurl + OpenRouter)
-Cari tweet bagus di niche → OpenRouter AI draft → lo approve → post via xurl
-PENTING: Script ini TIDAK auto-post tanpa approval lo
+3_reply_helper.py — SocialBlast Reply Helper v2
+=================================================
+Reply quality-first ke tweet dari seed_accounts.json (bukan random trending).
+Strategy: add value, build visibility di komunitas crypto yang relevan.
+
+Cron (2x/hari — jam aktif crypto community):
+  0 10 * * * cd /root/socialblast && python scripts/3_reply_helper.py >> logs/reply.log 2>&1
+  0 21 * * * cd /root/socialblast && python scripts/3_reply_helper.py >> logs/reply.log 2>&1
 """
 
 import subprocess
 import json
-import time
-import random
-import logging
 import os
-from datetime import datetime
-from pathlib import Path
+import sys
+import random
+import time
+from datetime import datetime, timezone, timedelta
 
-# ─── CONFIG ───────────────────────────────────────────────────────────────────
-SEARCH_QUERIES = [
-    "solana ecosystem lang:en -is:retweet min_faves:100",
-    "crypto alpha today lang:en -is:retweet min_faves:100",
-    "DeFi analysis lang:en -is:retweet min_faves:50",
-    "on-chain insights lang:en -is:retweet min_faves:50",
-    "bitcoin thesis lang:en -is:retweet min_faves:100",
-]
+# ── Config ────────────────────────────────────────────────────────────────────
+SEED_FILE      = "data/seed_accounts.json"
+STATE_FILE     = "data/reply_state.json"
+TEMPLATE_FILE  = "data/tweet_templates.json"
+LOG_FILE       = "logs/reply.log"
 
-MAX_DRAFTS_PER_RUN  = 5        # Berapa draft yang lo mau review per sesi
-NICHE_CONTEXT = "crypto, DeFi, Solana, on-chain analysis, market alpha"
+# Batas harian total reply (semua tier)
+DAILY_REPLY_LIMIT = 13          # sesuai dengan sum tier limits (2+6+5)
+SESSION_LIMIT     = 5           # max per sesi (cron 2x/hari = ~10 total)
 
-ROOT   = Path(__file__).resolve().parent.parent
-LOG_DIR  = ROOT / "logs"
-DATA_DIR = ROOT / "data"
-LOG_DIR.mkdir(exist_ok=True)
-DATA_DIR.mkdir(exist_ok=True)
+# Delay antar aksi
+MIN_DELAY      = 45             # detik — lebih lambat dari engagement cron
+MAX_DELAY      = 120
+# ──────────────────────────────────────────────────────────────────────────────
 
-# ─── LOGGING ──────────────────────────────────────────────────────────────────
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler(LOG_DIR / "reply.log"),
-        logging.StreamHandler(),
-    ],
-)
-log = logging.getLogger(__name__)
 
-# ─── OPENROUTER CLIENT ────────────────────────────────────────────────────────
-def get_openai_client():
-    from openai import OpenAI
-    api_key = os.getenv("OPENROUTER_API_KEY")
-    if not api_key:
-        log.error("OPENROUTER_API_KEY tidak ditemukan di environment")
-        return None
-    return OpenAI(
-        api_key=api_key,
-        base_url="https://openrouter.ai/api/v1",
-    )
+def log(msg: str):
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    line = f"[{ts}] {msg}"
+    print(line)
+    os.makedirs("logs", exist_ok=True)
+    with open(LOG_FILE, "a") as f:
+        f.write(line + "\n")
 
-# ─── STATE ────────────────────────────────────────────────────────────────────
-STATE_FILE   = DATA_DIR / "reply_state.json"
-DRAFTS_FILE  = DATA_DIR / "pending_replies.json"
 
-def load_state() -> dict:
-    if STATE_FILE.exists():
-        return json.loads(STATE_FILE.read_text())
-    return {"replied_ids": [], "total_replies": 0, "approved": 0, "rejected": 0}
-
-def save_state(state: dict):
-    STATE_FILE.write_text(json.dumps(state, indent=2))
-
-def load_drafts() -> list:
-    if DRAFTS_FILE.exists():
-        return json.loads(DRAFTS_FILE.read_text())
-    return []
-
-def save_drafts(drafts: list):
-    DRAFTS_FILE.write_text(json.dumps(drafts, indent=2))
-
-# ─── XURL HELPERS ─────────────────────────────────────────────────────────────
-def xurl(args: list[str]) -> dict | None:
+def run_xurl(args: list[str], as_json=True) -> dict | list | None:
     cmd = ["xurl"] + args
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        if result.returncode != 0:
-            log.warning(f"xurl error: {result.stderr.strip()[:200]}")
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=25)
+        if r.returncode != 0:
+            log(f"[WARN] xurl error: {r.stderr.strip()[:100]}")
             return None
-        if not result.stdout.strip():
-            return None
-        return json.loads(result.stdout)
-    except subprocess.TimeoutExpired:
-        log.warning("xurl timeout")
-        return None
-    except json.JSONDecodeError:
-        log.warning(f"xurl non-JSON: {result.stdout.strip()[:200]}")
-        return None
-    except FileNotFoundError:
-        log.error("xurl tidak ditemukan di PATH")
+        return json.loads(r.stdout) if as_json else r.stdout.strip()
+    except (subprocess.TimeoutExpired, json.JSONDecodeError) as e:
+        log(f"[ERROR] xurl failed: {e}")
         return None
 
 
-def search_tweets(query: str) -> list[dict]:
-    result = xurl(["search", query, "-n", "10"])
-    if not result:
+def jitter(min_s=MIN_DELAY, max_s=MAX_DELAY):
+    delay = random.uniform(min_s, max_s)
+    log(f"  ⏳ Waiting {delay:.0f}s...")
+    time.sleep(delay)
+
+
+def load_json(path: str, default):
+    if os.path.exists(path):
+        try:
+            with open(path) as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            log(f"[WARN] {path} corrupt, using default")
+    return default
+
+
+def save_json(path: str, data):
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def get_today_key() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+def load_state() -> dict:
+    default = {"date": get_today_key(), "replied_tweets": [], "replied_accounts": {}, "daily_count": 0}
+    state = load_json(STATE_FILE, default)
+    # Reset jika hari baru
+    if state.get("date") != get_today_key():
+        log("[INFO] New day — resetting daily state")
+        state = default
+    return state
+
+
+def save_state(state: dict):
+    state["date"] = get_today_key()
+    save_json(STATE_FILE, state)
+
+
+def is_tweet_eligible(tweet: dict, seed_handle: str, state: dict, rules: dict) -> tuple[bool, str]:
+    """Cek apakah tweet layak di-reply. Return (eligible, reason)."""
+    tweet_id = str(tweet.get("id") or tweet.get("id_str", ""))
+
+    # Sudah pernah direply?
+    if tweet_id in state["replied_tweets"]:
+        return False, "already replied"
+
+    # Sudah reply akun ini hari ini?
+    if state["replied_accounts"].get(seed_handle, 0) >= 1:
+        return False, f"already replied @{seed_handle} today"
+
+    text = tweet.get("text", "")
+    text_lower = text.lower()
+
+    # Skip retweet
+    if text_lower.startswith("rt @"):
+        return False, "is retweet"
+
+    # Skip reply (tweet yang mulai dengan @mention)
+    if text.startswith("@"):
+        return False, "is reply tweet"
+
+    # Skip kalau cuma media tanpa teks substantif
+    if len(text.strip()) < 30:
+        return False, "too short / media only"
+
+    # Cek age
+    created_at = tweet.get("created_at", "")
+    if created_at:
+        try:
+            # Parse berbagai format
+            if "Z" in created_at:
+                tweet_time = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+            else:
+                tweet_time = datetime.fromisoformat(created_at)
+            age_minutes = (datetime.now(timezone.utc) - tweet_time).total_seconds() / 60
+            min_age = rules.get("min_tweet_age_minutes", 5)
+            max_age = rules.get("max_tweet_age_minutes", 120)
+            if age_minutes < min_age:
+                return False, f"too fresh ({age_minutes:.0f}min)"
+            if age_minutes > max_age:
+                return False, f"too old ({age_minutes:.0f}min)"
+        except (ValueError, TypeError):
+            pass  # Kalau tidak bisa parse, lanjut saja
+
+    return True, "ok"
+
+
+def score_tweet_priority(tweet: dict) -> float:
+    """Skor prioritas tweet — yang lebih engaging diprioritaskan."""
+    text = tweet.get("text", "")
+    metrics = tweet.get("public_metrics", {})
+    score = 0.0
+
+    # Prefer tweet dengan pertanyaan atau diskusi terbuka
+    if "?" in text:
+        score += 15
+    if any(w in text.lower() for w in ["opinion", "thoughts", "agree", "hot take", "unpopular"]):
+        score += 10
+    if any(w in text.lower() for w in ["data", "%", "analysis", "report", "study"]):
+        score += 8
+
+    # Prefer tweet yang sudah dapat traction tapi masih fresh
+    likes = metrics.get("like_count", 0)
+    replies = metrics.get("reply_count", 0)
+    if 5 <= likes <= 200:    # sweet spot: cukup visible tapi tidak terlalu ramai
+        score += 12
+    if replies > 0:
+        score += 5           # ada diskusi berjalan = lebih natural untuk join
+
+    return score
+
+
+def build_reply_context(seed_tweet_text: str, seed_handle: str) -> str:
+    """
+    Build prompt untuk generate reply berkualitas.
+    Dalam produksi ini bisa dipanggil ke AI API atau pakai template manual.
+    """
+    # Template reply berdasarkan tipe konten
+    tweet_lower = seed_tweet_text.lower()
+
+    if "?" in seed_tweet_text:
+        # Tweet berupa pertanyaan — jawab dengan perspective + data
+        templates = [
+            "Dari pengalaman gue, {point}. Data juga support ini — {data_point}. Curious apakah {handle} punya data berbeda?",
+            "Perspective gue: {point}. Yang sering diabaikan adalah {nuance}. Tapi ultimately depends on timeframe.",
+            "Interesting question. Gue cenderung ke {stance} karena {reason}. Counterargument terkuat adalah {counter} — tapi gue masih belum convince.",
+        ]
+    elif any(w in tweet_lower for w in ["predict", "will", "soon", "expect"]):
+        # Prediksi — tambah data atau nuance
+        templates = [
+            "Setup ini menarik. Kalau tambahin context — {data_point} — probabilitasnya naik signifikan. Risk utama menurut gue: {risk}.",
+            "Sepakat dengan direction, tapi timing gue lebih {stance}. On-chain data menunjukkan {observation} yang bisa delay catalyst.",
+            "Thesis valid. Satu layer yang sering miss: {nuance}. Itu bisa jadi accelerator atau invalidation tergantung {condition}.",
+        ]
+    elif any(w in tweet_lower for w in ["data", "chart", "%", "report"]):
+        # Data/analisis — extend dengan insight tambahan
+        templates = [
+            "Thanks for sharing data ini. Yang gue tambahkan: {additional_data}. Combined, ini paint picture yang {assessment}.",
+            "Data point yang complement ini: {data_point}. Kalau dua signal ini align, biasanya {outcome} dalam {timeframe}.",
+            "Interesting data. Konteks yang helpful: {context}. Ini yang bikin gue {stance} untuk {timeframe} ke depan.",
+        ]
+    else:
+        # General — add perspective atau counter-point
+        templates = [
+            "Valid point. Yang gue add: {point}. Ini yang sering missed dalam diskusi ini.",
+            "Agree dengan premis. Edge case yang worth considering: {nuance}. Tergantung apakah {condition}.",
+            "Interesting take. Dari angle berbeda: {alternative_view}. Keduanya bisa benar tergantung {condition}.",
+        ]
+
+    # Return template terpilih — dalam produksi, fill placeholders via AI API
+    # Untuk sekarang return template as-is untuk manual review mode
+    return random.choice(templates)
+
+
+def fetch_recent_tweets(handle: str, count: int = 10) -> list[dict]:
+    """Fetch tweet terbaru dari satu akun."""
+    data = run_xurl(["search", f"from:{handle}", "-n", str(count)])
+    if not data:
         return []
-
-    tweets = result.get("data", [])
-    users = {u["id"]: u["username"] for u in result.get("includes", {}).get("users", [])}
-
-    out = []
-    for tw in tweets:
-        tid = str(tw.get("id", ""))
-        if not tid:
-            continue
-        author_id = str(tw.get("author_id", ""))
-        out.append({
-            "id": tid,
-            "text": tw.get("text", ""),
-            "author_id": author_id,
-            "username": users.get(author_id, "unknown"),
-        })
-    return out
+    if isinstance(data, list):
+        return data
+    return data.get("data", data.get("tweets", []))
 
 
-def post_reply(tweet_id: str, content: str) -> bool:
-    """Reply to tweet via xurl. Return True kalau berhasil."""
-    result = xurl(["reply", tweet_id, content])
+def post_reply(tweet_id: str, reply_text: str) -> bool:
+    """Post reply ke tweet_id."""
+    result = run_xurl(["reply", str(tweet_id), reply_text], as_json=False)
     return result is not None
 
 
-# ─── AI DRAFT GENERATOR ───────────────────────────────────────────────────────
-SYSTEM_PROMPT = f"""Kamu adalah crypto analyst dengan voice yang opinionated tapi berbobot.
-Niche: {NICHE_CONTEXT}
+def main():
+    log("=== 3_reply_helper.py v2 START ===")
 
-Tugas: Buat reply pendek untuk tweet crypto yang dikasih.
-
-Rules:
-- Max 200 karakter (harus muat di Twitter)
-- Bahasa: Inggris (crypto Twitter = English)
-- Voice: Direct, confident, ada insight-nya — BUKAN sycophantic
-- JANGAN mulai dengan "Great point!" atau "I agree!"
-- Kasih hot take atau tambah data/angle yang tweet aslinya belum sebut
-- Boleh controversial tapi tetap berdasar
-- Jangan pake hashtag atau emoji berlebihan (max 1 emoji kalau perlu)
-
-Output: Hanya teks reply-nya saja, tanpa penjelasan atau tanda kutip."""
-
-def generate_reply_draft(tweet_text: str, author: str, client) -> str | None:
-    """Generate draft reply pakai OpenAI."""
-    try:
-        response = client.chat.completions.create(
-            model="google/gemini-2.0-flash-001",  # GRATIS via OpenRouter
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": f"Tweet dari @{author}:\n\n{tweet_text}"}
-            ],
-            max_tokens=100,
-            temperature=0.85,
-        )
-        draft = response.choices[0].message.content.strip()
-        draft = draft.strip('"').strip("'")
-        return draft
-    except Exception as e:
-        log.error(f"OpenAI error: {e}")
-        return None
-
-
-# ─── INTERACTIVE APPROVAL ─────────────────────────────────────────────────────
-def review_and_post_drafts():
-    """Mode interaktif: review semua pending drafts, approve/reject/edit."""
-    drafts = load_drafts()
-    if not drafts:
-        log.info("Tidak ada pending drafts. Jalankan dengan --draft dulu.")
-        return
+    # Load config
+    seed_config = load_json(SEED_FILE, {})
+    if not seed_config:
+        log("[EXIT] seed_accounts.json tidak ditemukan")
+        sys.exit(1)
 
     state = load_state()
-    log.info(f"\n{'='*60}")
-    log.info(f"Ada {len(drafts)} draft reply menunggu review")
-    log.info(f"{'='*60}\n")
+    reply_rules = seed_config.get("reply_rules", {})
 
-    remaining = []
+    # Cek daily limit
+    if state["daily_count"] >= DAILY_REPLY_LIMIT:
+        log(f"[EXIT] Daily limit reached ({DAILY_REPLY_LIMIT} replies)")
+        sys.exit(0)
 
-    for i, draft in enumerate(drafts, 1):
-        print(f"\n[{i}/{len(drafts)}] TWEET ASLI dari @{draft['author']}:")
-        print(f"{'─'*50}")
-        print(draft["tweet_text"][:300])
-        print(f"\n💬 DRAFT REPLY:")
-        print(f"{'─'*50}")
-        print(draft["reply_draft"])
-        print(f"\n({len(draft['reply_draft'])} karakter)")
-        print(f"\nOptions: [y] Post | [e] Edit | [s] Skip | [q] Quit")
+    replies_this_session = 0
 
-        choice = input("Pilihan lo: ").strip().lower()
+    # Iterasi per tier (tier_2 dulu karena sweet spot, lalu tier_3, baru tier_1)
+    tier_order = ["tier_2", "tier_3", "tier_1"]
 
-        if choice == "q":
-            remaining.extend(drafts[i-1:])
-            break
-        elif choice == "y":
-            if post_reply(draft["tweet_id"], draft["reply_draft"]):
-                print(f"✅ Reply posted!")
-                state["total_replies"] += 1
-                state["approved"] += 1
-                state["replied_ids"].append(draft["tweet_id"])
-            else:
-                print(f"❌ Gagal post reply")
-                remaining.append(draft)
+    for tier_name in tier_order:
+        tier = seed_config.get(tier_name, {})
+        accounts = tier.get("accounts", [])
+        tier_limit = tier.get("daily_reply_limit", 3)
 
-            delay = random.uniform(15, 45)
-            print(f"Waiting {delay:.0f}s sebelum lanjut...")
-            time.sleep(delay)
+        # Shuffle akun dalam tier biar tidak selalu urutan sama
+        random.shuffle(accounts)
 
-        elif choice == "e":
-            print(f"\nEdit reply (Enter kosong = batal):")
-            edited = input("> ").strip()
-            if edited:
-                draft["reply_draft"] = edited
-                if post_reply(draft["tweet_id"], edited):
-                    print(f"✅ Reply edited & posted!")
-                    state["total_replies"] += 1
-                    state["approved"] += 1
-                    state["replied_ids"].append(draft["tweet_id"])
-                else:
-                    print(f"❌ Gagal post reply")
-                    remaining.append(draft)
-
-                delay = random.uniform(15, 45)
-                print(f"Waiting {delay:.0f}s...")
-                time.sleep(delay)
-            else:
-                print("Batal edit, draft disimpan")
-                remaining.append(draft)
-        else:
-            state["rejected"] += 1
-            print(f"⏭ Skipped")
-
-        save_state(state)
-
-    save_drafts(remaining)
-    print(f"\n{'='*60}")
-    print(f"Review selesai. Approved: {state['approved']} | Pending: {len(remaining)}")
-    print(f"{'='*60}")
-
-
-# ─── DRAFT GENERATION MODE ────────────────────────────────────────────────────
-def generate_drafts():
-    """Cari tweets dan generate draft replies. Simpan ke pending queue."""
-    log.info("=" * 50)
-    log.info(f"Reply Helper (DRAFT MODE) — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-
-    client = get_openai_client()
-    if not client:
-        return
-
-    state = load_state()
-    existing_drafts = load_drafts()
-    replied_ids = set(state["replied_ids"])
-    existing_draft_ids = {d["tweet_id"] for d in existing_drafts}
-
-    new_drafts = []
-    queries = random.sample(SEARCH_QUERIES, min(3, len(SEARCH_QUERIES)))
-
-    for query in queries:
-        if len(new_drafts) >= MAX_DRAFTS_PER_RUN:
-            break
-
-        log.info(f"Searching: '{query}'...")
-        tweets = search_tweets(query)
-
-        if not tweets:
-            log.info("Tidak ada tweets ditemukan")
-            continue
-
-        random.shuffle(tweets)
-
-        for tweet in tweets:
-            if len(new_drafts) >= MAX_DRAFTS_PER_RUN:
+        for account in accounts:
+            if replies_this_session >= SESSION_LIMIT:
+                log(f"[STOP] Session limit reached ({SESSION_LIMIT})")
+                break
+            if state["daily_count"] >= DAILY_REPLY_LIMIT:
                 break
 
-            tweet_id = tweet["id"]
-            if tweet_id in replied_ids or tweet_id in existing_draft_ids:
+            handle = account["handle"]
+            niche = account.get("niche", "")
+
+            # Cek tier daily limit
+            tier_count_today = sum(
+                1 for acc_handle, cnt in state["replied_accounts"].items()
+                if cnt > 0 and any(
+                    a["handle"] == acc_handle
+                    for a in seed_config.get(tier_name, {}).get("accounts", [])
+                )
+            )
+            if tier_count_today >= tier_limit:
+                log(f"  [SKIP] {tier_name} limit reached ({tier_limit})")
+                break
+
+            log(f"\n🔍 Checking @{handle} [{tier_name}] — {niche}")
+
+            tweets = fetch_recent_tweets(handle, count=15)
+            if not tweets:
+                log(f"  [SKIP] No tweets found for @{handle}")
+                jitter(5, 15)
                 continue
 
-            author = tweet["username"]
-            text   = tweet["text"]
+            # Filter dan score
+            candidates = []
+            for tweet in tweets:
+                eligible, reason = is_tweet_eligible(tweet, handle, state, reply_rules)
+                if eligible:
+                    priority = score_tweet_priority(tweet)
+                    candidates.append((priority, tweet))
+                else:
+                    log(f"  [-] Tweet ineligible: {reason}")
 
-            if len(text) < 20:
+            if not candidates:
+                log(f"  [SKIP] No eligible tweets from @{handle}")
                 continue
 
-            log.info(f"Generating draft untuk tweet @{author}...")
-            draft_text = generate_reply_draft(text, author, client)
+            # Pick tweet terbaik (highest priority score)
+            candidates.sort(key=lambda x: x[0], reverse=True)
+            _, target_tweet = candidates[0]
+            tweet_id = str(target_tweet.get("id") or target_tweet.get("id_str"))
+            tweet_text = target_tweet.get("text", "")[:100]
 
-            if draft_text:
-                new_drafts.append({
-                    "tweet_id":    tweet_id,
-                    "author":      author,
-                    "tweet_text":  text,
-                    "reply_draft": draft_text,
-                    "created_at":  datetime.now().isoformat(),
-                })
-                log.info(f"✅ Draft: {draft_text[:80]}...")
+            log(f"  📌 Target tweet: {tweet_text}...")
 
-            time.sleep(1)  # rate limit OpenAI
+            # Build reply template
+            reply_template = build_reply_context(target_tweet.get("text", ""), handle)
 
-    all_drafts = existing_drafts + new_drafts
-    save_drafts(all_drafts)
-    log.info(f"Generated {len(new_drafts)} draft baru. Total pending: {len(all_drafts)}")
-    log.info("Jalankan dengan --review untuk approve & post")
+            # ── HUMAN-IN-THE-LOOP ──────────────────────────────────────────
+            # Print untuk review manual sebelum post
+            log(f"\n  💬 REPLY TEMPLATE (untuk di-customize):")
+            log(f"  → {reply_template}")
+            log(f"  Tweet ID: {tweet_id}")
+            log(f"  ⚠️  Auto-post DISABLED — edit & kirim manual via xurl atau reply_helper UI")
+            # ── END HUMAN-IN-THE-LOOP ──────────────────────────────────────
+
+            # Uncomment baris di bawah untuk enable auto-post (HATI-HATI)
+            # success = post_reply(tweet_id, reply_text_filled)
+            # if success:
+            #     ...
+
+            # Update state (as queued untuk review)
+            state["replied_tweets"].append(tweet_id)
+            state["replied_accounts"][handle] = state["replied_accounts"].get(handle, 0) + 1
+            state["daily_count"] += 1
+            replies_this_session += 1
+            save_state(state)
+
+            log(f"  [OK] Queued reply #{state['daily_count']} to @{handle}")
+            jitter()
+
+        if replies_this_session >= SESSION_LIMIT:
+            break
+
+    log(f"\n=== DONE — {replies_this_session} replies queued this session | {state['daily_count']}/{DAILY_REPLY_LIMIT} today ===")
 
 
-# ─── ENTRY POINT ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    import sys
-
-    if "--review" in sys.argv:
-        review_and_post_drafts()
-    elif "--draft" in sys.argv or len(sys.argv) == 1:
-        generate_drafts()
-    else:
-        print("Usage:")
-        print("  python3 3_reply_helper.py --draft    # Generate drafts baru")
-        print("  python3 3_reply_helper.py --review   # Review & post pending drafts")
+    main()
